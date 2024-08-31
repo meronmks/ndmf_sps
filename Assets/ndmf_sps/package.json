@@ -1,0 +1,23 @@
+{
+    "name": "com.meronmks.ndmfsps",
+    "version": "0.0.0-alpha.1",
+    "displayName": "NDMF_SPS",
+    "unity": "2022.3",
+    "description": "",
+    "keywords": [
+      "Tool",
+      "Unity"
+    ],
+    "author": {
+      "name": "meronmks",
+      "url": "https://github.com/meronmks/"
+    },
+    "license": "MIT",
+    "private": true,
+    "url" : "https://github.com/meronmks/ndmf_sps",
+    "vpmDependencies": {
+      "com.vrchat.avaters": ">=3.7.0",
+      "nadena.dev.ndmf": ">=1.4.1",
+      "nadena.dev.modular-avatar": ">=1.9.14"
+    }
+}

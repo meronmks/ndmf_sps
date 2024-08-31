@@ -1,0 +1,31 @@
+{
+    "name": "com.meronmks.spsforndmf",
+    "rootNamespace": "com.meronmks.spsforndmf",
+    "references": [
+        "com.meronmks.spsforndmf.runtime",
+        "nadena.dev.ndmf",
+        "nadena.dev.ndmf.runtime",
+        "nadena.dev.ndmf.vrchat",
+        "nadena.dev.modular-avatar.core"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "VRCSDKBase-Editor.dll",
+        "VRCSDKBase.dll",
+        "VRCSDK3A-Editor.dll",
+        "VRCSDK3A.dll",
+        "System.Collections.Immutable.dll",
+        "VRC.SDK3.Dynamics.Contact.dll",
+        "VRC.SDK3.Dynamics.Contact.Editor.dll",
+        "VRC.Dynamics.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
