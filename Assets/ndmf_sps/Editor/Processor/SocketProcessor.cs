@@ -92,7 +92,7 @@ namespace com.meronmks.spsforndmf
         /// なんだろ・・・？謎
         /// </summary>
         /// <param name="root"></param>
-        internal static void CreateHaptics(Transform root)
+        internal static void CreateHaptics(Transform root, Socket.Haptics haptics)
         {
             var hapticsRoot = Processor.CreateParentGameObject("Haptics", root);
             var penSelfNewRoot = Processor.CreateParentGameObject("PenSelfNewRoot", hapticsRoot.transform);
@@ -100,9 +100,150 @@ namespace com.meronmks.spsforndmf
             var penOthersNewRoot = Processor.CreateParentGameObject("PenOthersNewRoot", hapticsRoot.transform);
             var penOthersNewTip = Processor.CreateParentGameObject("PenOthersNewTip", hapticsRoot.transform);
 
+            if (haptics == Socket.Haptics.On)
+            {
+                var touchSelf = Processor.CreateParentGameObject("TouchSelf", hapticsRoot.transform);
+                var touchSelfClose = Processor.CreateParentGameObject("TouchSelfClose", hapticsRoot.transform);
+                var touchOthers = Processor.CreateParentGameObject("TouchOthers", hapticsRoot.transform);
+                var touchOthersClose = Processor.CreateParentGameObject("TouchOthersClose", hapticsRoot.transform);
+                var penOthers = Processor.CreateParentGameObject("PenOthers", hapticsRoot.transform);
+                var penOthersClose = Processor.CreateParentGameObject("PenOthersClose", hapticsRoot.transform);
+                var frotOthers = Processor.CreateParentGameObject("FrotOthers", hapticsRoot.transform); //Typoっぽいが元がこうなので一旦これで
+                
+                Processor.CreateVRCContactReceiver(
+                    touchSelf,
+                    ContactBase.ShapeType.Sphere,
+                    0.052f,
+                    1f,
+                    Vector3.back * 0.052f,
+                    Quaternion.identity,
+                    true,
+                    false,
+                    true,
+                    new []
+                    {
+                        "Hand",
+                        "Finger",
+                        "Foot"
+                    },
+                    ContactReceiver.ReceiverType.Proximity,
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelf.name.Replace("/", "_")}");
+                
+                Processor.CreateVRCContactReceiver(
+                    touchSelfClose,
+                    ContactBase.ShapeType.Capsule,
+                    0.0208f,
+                    0.052f,
+                    Vector3.back * 0.026f,
+                    Quaternion.Euler(90f,0f,0f),
+                    true,
+                    false,
+                    true,
+                    new []
+                    {
+                        "Hand",
+                        "Finger",
+                        "Foot"
+                    },
+                    ContactReceiver.ReceiverType.Constant,
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelfClose.name.Replace("/", "_")}");
+                
+                Processor.CreateVRCContactReceiver(
+                    touchOthers,
+                    ContactBase.ShapeType.Sphere,
+                    0.052f,
+                    1f,
+                    Vector3.back * 0.052f,
+                    Quaternion.identity,
+                    false,
+                    true,
+                    true,
+                    new []
+                    {
+                        "Head",
+                        "Hand",
+                        "Finger",
+                        "Foot"
+                    },
+                    ContactReceiver.ReceiverType.Proximity,
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthers.name.Replace("/", "_")}");
+                
+                Processor.CreateVRCContactReceiver(
+                    touchOthersClose,
+                    ContactBase.ShapeType.Capsule,
+                    0.0208f,
+                    0.052f,
+                    Vector3.back * 0.026f,
+                    Quaternion.Euler(90f,0f,0f),
+                    false,
+                    true,
+                    true,
+                    new []
+                    {
+                        "Head",
+                        "Hand",
+                        "Finger",
+                        "Foot"
+                    },
+                    ContactReceiver.ReceiverType.Constant,
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthersClose.name.Replace("/", "_")}");
+                
+                Processor.CreateVRCContactReceiver(
+                    penOthers,
+                    ContactBase.ShapeType.Sphere,
+                    0.052f,
+                    1f,
+                    Vector3.back * 0.052f,
+                    Quaternion.identity,
+                    false,
+                    true,
+                    true,
+                    new []
+                    {
+                        "TPS_Pen_Penetrating"
+                    },
+                    ContactReceiver.ReceiverType.Proximity,
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthers.name.Replace("/", "_")}");
+                
+                Processor.CreateVRCContactReceiver(
+                    penOthersClose,
+                    ContactBase.ShapeType.Capsule,
+                    0.0208f,
+                    0.052f,
+                    Vector3.back * 0.026f,
+                    Quaternion.Euler(90f,0f,0f),
+                    false,
+                    true,
+                    true,
+                    new []
+                    {
+                        "TPS_Pen_Penetrating"
+                    },
+                    ContactReceiver.ReceiverType.Constant,
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersClose.name.Replace("/", "_")}");
+                
+                Processor.CreateVRCContactReceiver(
+                    frotOthers,
+                    ContactBase.ShapeType.Sphere,
+                    0.1f,
+                    1f,
+                    Vector3.forward * 0.05f,
+                    Quaternion.identity,
+                    false,
+                    true,
+                    true,
+                    new []
+                    {
+                        "TPS_Orf_Root"
+                    },
+                    ContactReceiver.ReceiverType.Proximity,
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{frotOthers.name.Replace("/", "_")}");
+            }
+            
             Processor.CreateVRCContactReceiver(
                 penSelfNewRoot,
                 ContactBase.ShapeType.Sphere,
+                1f,
                 1f,
                 Vector3.zero,
                 Quaternion.identity,
@@ -120,6 +261,7 @@ namespace com.meronmks.spsforndmf
                 penSelfNewTip,
                 ContactBase.ShapeType.Sphere,
                 1f,
+                1f,
                 Vector3.zero,
                 Quaternion.identity,
                 true,
@@ -136,6 +278,7 @@ namespace com.meronmks.spsforndmf
                 penOthersNewRoot,
                 ContactBase.ShapeType.Sphere,
                 1f,
+                1f,
                 Vector3.zero,
                 Quaternion.identity,
                 false,
@@ -151,6 +294,7 @@ namespace com.meronmks.spsforndmf
             Processor.CreateVRCContactReceiver(
                 penOthersNewTip,
                 ContactBase.ShapeType.Sphere,
+                1f,
                 1f,
                 Vector3.zero,
                 Quaternion.identity,
@@ -187,6 +331,7 @@ namespace com.meronmks.spsforndmf
                 receiverGameObject,
                 ContactBase.ShapeType.Sphere,
                 0.3f,
+                1f,
                 Vector3.zero,
                 Quaternion.identity,
                 false,

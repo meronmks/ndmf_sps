@@ -12,5 +12,14 @@ namespace com.meronmks.spsforndmf.runtime
         }
 
         public SocketMode mode;
+        public bool enableActiveAnimation;
+
+        public enum Haptics
+        {
+            On,
+            Off
+        }
+
+        public Haptics haptics;
     }
 }

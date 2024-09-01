@@ -33,7 +33,7 @@ namespace com.meronmks.spsforndmf
 
                 SocketProcessor.CreateSender(socket.transform);
                 SocketProcessor.CreateLights(socket.transform, socket.mode);
-                SocketProcessor.CreateHaptics(socket.transform);
+                SocketProcessor.CreateHaptics(socket.transform, socket.haptics);
                 if (socket.enableDepthAnimations)
                 {
                     SocketProcessor.CreateAnimations(socket.transform);
@@ -65,11 +65,12 @@ namespace com.meronmks.spsforndmf
             transform.localScale = Vector3.one;
         }
 
-        internal static void CreateVRCContactReceiver(GameObject target, ContactBase.ShapeType shapeType, float radius, Vector3 pos, Quaternion rot, bool allowSelf, bool allowOthers, bool localOnly, string[] collisionTags, ContactReceiver.ReceiverType receiverType, string parameter)
+        internal static void CreateVRCContactReceiver(GameObject target, ContactBase.ShapeType shapeType, float radius, float height, Vector3 pos, Quaternion rot, bool allowSelf, bool allowOthers, bool localOnly, string[] collisionTags, ContactReceiver.ReceiverType receiverType, string parameter)
         {
             var receiver = target.AddComponent<VRCContactReceiver>();
             receiver.shapeType = shapeType;
             receiver.radius = radius;
+            receiver.height = height;
             receiver.position = pos;
             receiver.rotation = rot;
             receiver.allowSelf = allowSelf;
