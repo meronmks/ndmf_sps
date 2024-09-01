@@ -64,5 +64,32 @@ namespace com.meronmks.spsforndmf
             transform.localRotation = Quaternion.identity;
             transform.localScale = Vector3.one;
         }
+
+        internal static void CreateVRCContactReceiver(GameObject target, ContactBase.ShapeType shapeType, float radius, Vector3 pos, Quaternion rot, bool allowSelf, bool allowOthers, bool localOnly, string[] collisionTags, ContactReceiver.ReceiverType receiverType, string parameter)
+        {
+            var receiver = target.AddComponent<VRCContactReceiver>();
+            receiver.shapeType = shapeType;
+            receiver.radius = radius;
+            receiver.position = pos;
+            receiver.rotation = rot;
+            receiver.allowSelf = allowSelf;
+            receiver.allowOthers = allowOthers;
+            receiver.localOnly = localOnly;
+            receiver.collisionTags.AddRange(collisionTags);
+            receiver.receiverType = receiverType;
+            // この名前にあったアニメーションパラメータが必要
+            receiver.parameter = parameter;
+        }
+
+        internal static void CreateVRCContactSender(GameObject target, ContactBase.ShapeType shapeType, float radius, Vector3 pos, Quaternion rot, string[] collisionTags)
+        {
+            var sender = target.AddComponent<VRCContactSender>();
+            
+            sender.shapeType = shapeType;
+            sender.radius = radius;
+            sender.position = pos;
+            sender.rotation = rot;
+            sender.collisionTags.AddRange(collisionTags);
+        }
     }
 }

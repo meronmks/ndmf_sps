@@ -1,4 +1,5 @@
-﻿using UnityEditor.Graphs;
+﻿using NUnit.Framework;
+using UnityEditor.Graphs;
 using UnityEngine;
 using VRC.Dynamics;
 using VRC.SDK3.Dynamics.Contact.Components;
@@ -14,6 +15,8 @@ namespace com.meronmks.spsforndmf
         // SPSシェーダが対象のLightだと判定する色
         private static Color spsTypeColor = new Color(0, 0, 0, 255);
         
+        private const string SENDER_PARAMPREFIX = "OGB/Orf/";
+        
         /// <summary>
         /// TPSとSPSで使う何かへのSender
         /// </summary>
@@ -24,31 +27,33 @@ namespace com.meronmks.spsforndmf
             var rootObject = Processor.CreateParentGameObject("Root", senderObject.transform);
             var frontObject = Processor.CreateParentGameObject("Front", senderObject.transform);
 
-            var senderRootContact = rootObject.AddComponent<VRCContactSender>();
-            var senderFrontContact = frontObject.AddComponent<VRCContactSender>();
-
-            senderRootContact.shapeType = ContactBase.ShapeType.Sphere;
-            senderRootContact.radius = 0.001f;
-            senderRootContact.collisionTags.AddRange(new []
-            {
-                "TPS_Orf_Root",
-                "TPS_Orf_Root_SelfNotOnHips",
-                "SPSLL_Socket_Root",
-                "SPSLL_Socket_Root_SelfNotOnHips",
-                "SPSLL_Socket_Hole",
-                "SPSLL_Socket_Hole_SelfNotOnHips"
-            });
-
-            senderFrontContact.shapeType = ContactBase.ShapeType.Sphere;
-            senderFrontContact.radius = 0.001f;
-            senderFrontContact.position = Vector3.forward * 0.01f;
-            senderFrontContact.collisionTags.AddRange(new[]
-            {
-                "TPS_Orf_Norm",
-                "TPS_Orf_Norm_SelfNotOnHips",
-                "SPSLL_Socket_Front",
-                "SPSLL_Socket_Front_SelfNotOnHips"
-            });
+            Processor.CreateVRCContactSender(rootObject, 
+                ContactBase.ShapeType.Sphere, 
+                0.001f, 
+                Vector3.zero, 
+                Quaternion.identity, 
+                new []
+                {
+                    "TPS_Orf_Root",
+                    "TPS_Orf_Root_SelfNotOnHips",
+                    "SPSLL_Socket_Root",
+                    "SPSLL_Socket_Root_SelfNotOnHips",
+                    "SPSLL_Socket_Hole",
+                    "SPSLL_Socket_Hole_SelfNotOnHips"
+                });
+            
+            Processor.CreateVRCContactSender(frontObject, 
+                ContactBase.ShapeType.Sphere, 
+                0.001f, 
+                Vector3.forward * 0.01f, 
+                Quaternion.identity, 
+                new []
+                {
+                    "TPS_Orf_Norm",
+                    "TPS_Orf_Norm_SelfNotOnHips",
+                    "SPSLL_Socket_Front",
+                    "SPSLL_Socket_Front_SelfNotOnHips"
+                });
         }
         
         /// <summary>
@@ -95,66 +100,69 @@ namespace com.meronmks.spsforndmf
             var penOthersNewRoot = Processor.CreateParentGameObject("PenOthersNewRoot", hapticsRoot.transform);
             var penOthersNewTip = Processor.CreateParentGameObject("PenOthersNewTip", hapticsRoot.transform);
 
-            var receiverPenSelfNewRoot = penSelfNewRoot.AddComponent<VRCContactReceiver>();
-            var receiverPenSelfNewTip = penSelfNewTip.AddComponent<VRCContactReceiver>();
-            var receiverPenOthersNewRoot = penOthersNewRoot.AddComponent<VRCContactReceiver>();
-            var receiverPenOthersNewTip = penOthersNewTip.AddComponent<VRCContactReceiver>();
-
-            receiverPenSelfNewRoot.shapeType = ContactBase.ShapeType.Sphere;
-            receiverPenSelfNewRoot.radius = 1f;
-            receiverPenSelfNewRoot.position = Vector3.zero;
-            receiverPenSelfNewRoot.rotation = Quaternion.identity;
-            receiverPenSelfNewRoot.allowSelf = true;
-            receiverPenSelfNewRoot.allowOthers = false;
-            receiverPenSelfNewRoot.localOnly = true;
-            receiverPenSelfNewRoot.collisionTags.AddRange(new[]
-            {
-                "TPS_Pen_Root"
-            });
-            receiverPenSelfNewRoot.receiverType = ContactReceiver.ReceiverType.Proximity;
-            receiverPenSelfNewRoot.parameter = $"OGB/Orf/{root.gameObject.name}/{receiverPenSelfNewRoot.gameObject.name}";
+            Processor.CreateVRCContactReceiver(
+                penSelfNewRoot,
+                ContactBase.ShapeType.Sphere,
+                1f,
+                Vector3.zero,
+                Quaternion.identity,
+                true,
+                false,
+                true,
+                new []
+                {
+                    "TPS_Pen_Root"
+                },
+                ContactReceiver.ReceiverType.Proximity,
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penSelfNewRoot.name.Replace("/", "_")}");
             
-            receiverPenSelfNewTip.shapeType = ContactBase.ShapeType.Sphere;
-            receiverPenSelfNewTip.radius = 1f;
-            receiverPenSelfNewTip.position = Vector3.zero;
-            receiverPenSelfNewTip.rotation = Quaternion.identity;
-            receiverPenSelfNewTip.allowSelf = true;
-            receiverPenSelfNewTip.allowOthers = false;
-            receiverPenSelfNewTip.localOnly = true;
-            receiverPenSelfNewTip.collisionTags.AddRange(new[]
-            {
-                "TPS_Pen_Penetrating"
-            });
-            receiverPenSelfNewTip.receiverType = ContactReceiver.ReceiverType.Proximity;
-            receiverPenSelfNewTip.parameter = $"OGB/Orf/{root.gameObject.name}/{receiverPenSelfNewTip.gameObject.name}";
+            Processor.CreateVRCContactReceiver(
+                penSelfNewTip,
+                ContactBase.ShapeType.Sphere,
+                1f,
+                Vector3.zero,
+                Quaternion.identity,
+                true,
+                false,
+                true,
+                new []
+                {
+                    "TPS_Pen_Penetrating"
+                },
+                ContactReceiver.ReceiverType.Proximity,
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penSelfNewTip.name.Replace("/", "_")}");
             
-            receiverPenOthersNewRoot.shapeType = ContactBase.ShapeType.Sphere;
-            receiverPenOthersNewRoot.radius = 1f;
-            receiverPenOthersNewRoot.position = Vector3.zero;
-            receiverPenOthersNewRoot.rotation = Quaternion.identity;
-            receiverPenOthersNewRoot.allowSelf = false;
-            receiverPenOthersNewRoot.allowOthers = true;
-            receiverPenOthersNewRoot.localOnly = true;
-            receiverPenOthersNewRoot.collisionTags.AddRange(new[]
-            {
-                "TPS_Pen_Root"
-            });
-            receiverPenOthersNewRoot.receiverType = ContactReceiver.ReceiverType.Proximity;
-            receiverPenOthersNewRoot.parameter = $"OGB/Orf/{root.gameObject.name}/{receiverPenOthersNewRoot.gameObject.name}";
+            Processor.CreateVRCContactReceiver(
+                penOthersNewRoot,
+                ContactBase.ShapeType.Sphere,
+                1f,
+                Vector3.zero,
+                Quaternion.identity,
+                false,
+                true,
+                true,
+                new []
+                {
+                    "TPS_Pen_Root"
+                },
+                ContactReceiver.ReceiverType.Proximity,
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersNewRoot.name.Replace("/", "_")}");
             
-            receiverPenOthersNewTip.shapeType = ContactBase.ShapeType.Sphere;
-            receiverPenOthersNewTip.radius = 1f;
-            receiverPenOthersNewTip.position = Vector3.zero;
-            receiverPenOthersNewTip.rotation = Quaternion.identity;
-            receiverPenOthersNewTip.allowSelf = false;
-            receiverPenOthersNewTip.allowOthers = true;
-            receiverPenOthersNewTip.localOnly = true;
-            receiverPenOthersNewTip.collisionTags.AddRange(new[]
-            {
-                "TPS_Pen_Penetrating"
-            });
-            receiverPenOthersNewTip.receiverType = ContactReceiver.ReceiverType.Proximity;
-            receiverPenOthersNewTip.parameter = $"OGB/Orf/{root.gameObject.name}/{receiverPenOthersNewTip.gameObject.name}";
+            Processor.CreateVRCContactReceiver(
+                penOthersNewTip,
+                ContactBase.ShapeType.Sphere,
+                1f,
+                Vector3.zero,
+                Quaternion.identity,
+                false,
+                true,
+                true,
+                new []
+                {
+                    "TPS_Pen_Penetrating"
+                },
+                ContactReceiver.ReceiverType.Proximity,
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersNewTip.name.Replace("/", "_")}");
         }
         
         /// <summary>
@@ -175,22 +183,22 @@ namespace com.meronmks.spsforndmf
             var autoDistanceRoot = Processor.CreateParentGameObject("AutoDistance", root);
             var receiverGameObject = Processor.CreateParentGameObject("Receiver", autoDistanceRoot.transform);
             
-            var receiver = receiverGameObject.AddComponent<VRCContactReceiver>();
-            
-            receiver.shapeType = ContactBase.ShapeType.Sphere;
-            receiver.radius = 0.3f;
-            receiver.position = Vector3.zero;
-            receiver.rotation = Quaternion.identity;
-            receiver.allowSelf = false;
-            receiver.allowOthers = true;
-            receiver.localOnly = false;
-            receiver.collisionTags.AddRange(new[]
-            {
-                "TPS_Pen_Penetrating"
-            });
-            receiver.receiverType = ContactReceiver.ReceiverType.Proximity;
-            //TODO: 決まったパラメータはどこから来てるのか調べる。
-            //receiver.parameter = $"VF94_Blowjob_Ring/{autoDistanceRoot.gameObject.name}";
+            Processor.CreateVRCContactReceiver(
+                receiverGameObject,
+                ContactBase.ShapeType.Sphere,
+                0.3f,
+                Vector3.zero,
+                Quaternion.identity,
+                false,
+                true,
+                false,
+                new []
+                {
+                    "TPS_Pen_Penetrating"
+                },
+                ContactReceiver.ReceiverType.Proximity,
+                //TODO: 決まったパラメータはどこから来てるのか調べる。
+                "");
         }
     }
 }
