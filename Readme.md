@@ -4,7 +4,7 @@
 0. NDMF及びMAを導入済みであること
 1. このリポジトリをクローンまたはダウンロード
 2. `Assets/ndmf_sps` ディレクトリを使いたいプロジェクトのAssetsディレクトリにコピー
-3. Enjoing!
+3. Enjoy!
 
 早い目に[VPM](https://meronmks.github.io/vpm-repos/)に登録する予定です。
 たぶん。
