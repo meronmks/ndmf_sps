@@ -1,11 +1,11 @@
-using com.meronmks.spsforndmf;
+using com.meronmks.ndmfsps;
 using nadena.dev.ndmf;
 using UnityEditor.Graphs;
 using UnityEngine;
 
 [assembly: ExportsPlugin(typeof(SPSforNDMFPlugin))]
 
-namespace com.meronmks.spsforndmf
+namespace com.meronmks.ndmfsps
 {
     public class SPSforNDMFPlugin : Plugin<SPSforNDMFPlugin>
     {

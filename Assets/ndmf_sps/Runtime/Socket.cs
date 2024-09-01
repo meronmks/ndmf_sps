@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-namespace com.meronmks.spsforndmf.runtime
+namespace com.meronmks.ndmfsps.runtime
 {
     [AddComponentMenu(Values.COMPONENTS_BASE + nameof(Socket))]
     public class Socket : SPSforNDMFTagComponent
@@ -13,6 +14,7 @@ namespace com.meronmks.spsforndmf.runtime
 
         public SocketMode mode;
         public bool enableActiveAnimation;
+        public List<Action> activeAnimationActions = new List<Action>();
 
         public enum Haptics
         {

@@ -1,6 +1,6 @@
 {
-    "name": "com.meronmks.spsforndmf.runtime",
-    "rootNamespace": "com.meronmks.spsforndmf.runtime",
+    "name": "com.meronmks.ndmfsps.runtime",
+    "rootNamespace": "com.meronmks.ndmfsps.runtime",
     "references": [
         "nadena.dev.modular-avatar.core"
     ],

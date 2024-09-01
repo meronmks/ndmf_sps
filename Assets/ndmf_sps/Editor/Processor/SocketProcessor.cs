@@ -1,10 +1,13 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using UnityEditor.Graphs;
 using UnityEngine;
 using VRC.Dynamics;
 using VRC.SDK3.Dynamics.Contact.Components;
 
-namespace com.meronmks.spsforndmf
+namespace com.meronmks.ndmfsps
 {
     using runtime;
     using UnityEditor;
@@ -313,9 +316,162 @@ namespace com.meronmks.spsforndmf
         /// Plugの位置によってアニメーションさせる奴
         /// </summary>
         /// <param name="root"></param>
-        internal static void CreateAnimations(Transform root)
+        internal static void CreateAnimations(Transform root, ICollection<DepthAction> actions)
         {
+            var maxDist = Math.Max(0, actions.Max(a => Math.Max(a.startDistance, a.endDistance)));
+            var minDist = Math.Min(0, actions.Min(a => Math.Min(a.startDistance, a.endDistance)));
+            var offset = Math.Max(0, -minDist);
             
+            var animationsRoot = Processor.CreateParentGameObject("Animations", root);
+            var outerGameObject = Processor.CreateParentGameObject("Outer", animationsRoot.transform);
+            var frontOthersGameObject = Processor.CreateParentGameObject("FrontOthers", outerGameObject.transform);
+            var frontSelfGameObject = Processor.CreateParentGameObject("FrontSelf", outerGameObject.transform);
+            var backOthersGameObject = Processor.CreateParentGameObject("BackOthers", outerGameObject.transform);
+            var backSelfGameObject = Processor.CreateParentGameObject("BackSelf", outerGameObject.transform);
+            Processor.CreateVRCContactReceiver(
+                frontOthersGameObject,
+                ContactBase.ShapeType.Sphere,
+                0.03f,
+                1f,
+                Vector3.zero,
+                Quaternion.identity,
+                false,
+                true,
+                false,
+                new []
+                {
+                    "TPS_Pen_Penetrating"
+                },
+                ContactReceiver.ReceiverType.Proximity,
+                //TODO: 決まったパラメータはどこから来てるのか調べる。
+                "");
+            Processor.CreateVRCContactReceiver(
+                frontSelfGameObject,
+                ContactBase.ShapeType.Sphere,
+                0.03f,
+                1f,
+                Vector3.zero,
+                Quaternion.identity,
+                true,
+                false,
+                false,
+                new []
+                {
+                    "TPS_Pen_Penetrating"
+                },
+                ContactReceiver.ReceiverType.Proximity,
+                //TODO: 決まったパラメータはどこから来てるのか調べる。
+                "");
+            Processor.CreateVRCContactReceiver(
+                backOthersGameObject,
+                ContactBase.ShapeType.Sphere,
+                0.03f,
+                1f,
+                Vector3.zero,
+                Quaternion.identity,
+                false,
+                true,
+                false,
+                new []
+                {
+                    "TPS_Pen_Penetrating"
+                },
+                ContactReceiver.ReceiverType.Proximity,
+                //TODO: 決まったパラメータはどこから来てるのか調べる。
+                "");
+            Processor.CreateVRCContactReceiver(
+                backSelfGameObject,
+                ContactBase.ShapeType.Sphere,
+                0.03f,
+                1f,
+                Vector3.zero,
+                Quaternion.identity,
+                true,
+                false,
+                false,
+                new []
+                {
+                    "TPS_Pen_Penetrating"
+                },
+                ContactReceiver.ReceiverType.Proximity,
+                //TODO: 決まったパラメータはどこから来てるのか調べる。
+                "");
+            if (minDist < 0)
+            {
+                var innerGameObject = Processor.CreateParentGameObject("Inner", animationsRoot.transform);
+                var frontOthersInnerGameObject = Processor.CreateParentGameObject("FrontOthers", innerGameObject.transform);
+                var frontSelfInnerGameObject = Processor.CreateParentGameObject("FrontSelf", innerGameObject.transform);
+                var backOthersInnerGameObject = Processor.CreateParentGameObject("BackOthers", innerGameObject.transform);
+                var backSelfInnerGameObject = Processor.CreateParentGameObject("BackSelf", innerGameObject.transform);
+                Processor.CreateVRCContactReceiver(
+                    frontOthersInnerGameObject,
+                    ContactBase.ShapeType.Sphere,
+                    0.03f,
+                    1f,
+                    Vector3.zero,
+                    Quaternion.identity,
+                    false,
+                    true,
+                    false,
+                    new []
+                    {
+                        "TPS_Pen_Penetrating"
+                    },
+                    ContactReceiver.ReceiverType.Proximity,
+                    //TODO: 決まったパラメータはどこから来てるのか調べる。
+                    "");
+                Processor.CreateVRCContactReceiver(
+                    frontSelfInnerGameObject,
+                    ContactBase.ShapeType.Sphere,
+                    0.03f,
+                    1f,
+                    Vector3.zero,
+                    Quaternion.identity,
+                    true,
+                    false,
+                    false,
+                    new []
+                    {
+                        "TPS_Pen_Penetrating"
+                    },
+                    ContactReceiver.ReceiverType.Proximity,
+                    //TODO: 決まったパラメータはどこから来てるのか調べる。
+                    "");
+                Processor.CreateVRCContactReceiver(
+                    backOthersInnerGameObject,
+                    ContactBase.ShapeType.Sphere,
+                    0.03f,
+                    1f,
+                    Vector3.zero,
+                    Quaternion.identity,
+                    false,
+                    true,
+                    false,
+                    new []
+                    {
+                        "TPS_Pen_Penetrating"
+                    },
+                    ContactReceiver.ReceiverType.Proximity,
+                    //TODO: 決まったパラメータはどこから来てるのか調べる。
+                    "");
+                Processor.CreateVRCContactReceiver(
+                    backSelfInnerGameObject,
+                    ContactBase.ShapeType.Sphere,
+                    0.03f,
+                    1f,
+                    Vector3.zero,
+                    Quaternion.identity,
+                    true,
+                    false,
+                    false,
+                    new []
+                    {
+                        "TPS_Pen_Penetrating"
+                    },
+                    ContactReceiver.ReceiverType.Proximity,
+                    //TODO: 決まったパラメータはどこから来てるのか調べる。
+                    "");
+            }
         }
         
         /// <summary>

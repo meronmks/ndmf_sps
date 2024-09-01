@@ -6,7 +6,7 @@ using UnityEngine;
 using VRC.Dynamics;
 using VRC.SDK3.Dynamics.Contact.Components;
 
-namespace com.meronmks.spsforndmf
+namespace com.meronmks.ndmfsps
 {
     using runtime;
     using UnityEditor;
@@ -36,7 +36,7 @@ namespace com.meronmks.spsforndmf
                 SocketProcessor.CreateHaptics(socket.transform, socket.haptics);
                 if (socket.enableDepthAnimations)
                 {
-                    SocketProcessor.CreateAnimations(socket.transform);
+                    SocketProcessor.CreateAnimations(socket.transform, socket.depthActions);
                 }
                 SocketProcessor.CreateAutoDistance(socket.transform);
             }
