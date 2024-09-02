@@ -17,6 +17,9 @@
     "private": true,
     "url" : "https://github.com/meronmks/ndmf_sps",
     "repo": "https://meronmks.github.io/vpm-repos/vpm.json",
+    "dependencies": {
+      "com.unity.nuget.newtonsoft-json": "2.0.0"
+    },
     "vpmDependencies": {
       "com.vrchat.avaters": ">=3.7.0",
       "nadena.dev.ndmf": ">=1.4.1",

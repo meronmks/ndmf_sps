@@ -15,6 +15,7 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
+        "Newtonsoft.Json.dll",
         "VRCSDKBase-Editor.dll",
         "VRCSDKBase.dll",
         "VRCSDK3A-Editor.dll",
