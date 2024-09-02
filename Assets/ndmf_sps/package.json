@@ -10,11 +10,13 @@
     ],
     "author": {
       "name": "meronmks",
+      "email": "meronmks.8914@gmail.com",
       "url": "https://github.com/meronmks/"
     },
     "license": "MIT",
     "private": true,
     "url" : "https://github.com/meronmks/ndmf_sps",
+    "repo": "https://meronmks.github.io/vpm-repos/vpm.json",
     "vpmDependencies": {
       "com.vrchat.avaters": ">=3.7.0",
       "nadena.dev.ndmf": ">=1.4.1",
