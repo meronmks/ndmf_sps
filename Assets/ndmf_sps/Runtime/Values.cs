@@ -1,8 +1,9 @@
 ﻿namespace com.meronmks.ndmfsps.runtime
 {
-    internal class Values
+    public class Values
     {
-        internal const string TOOL_NAME = "SPSforNDMF";
-        internal const string COMPONENTS_BASE = TOOL_NAME + "/";
+        public const string TOOL_NAME = "NDMF_SPS";
+        public const string PACKAGE_NAME = "ndmfsps";
+        public const string COMPONENTS_BASE = TOOL_NAME + "/";
     }
 }
