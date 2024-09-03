@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace com.meronmks.ndmfsps.runtime
 {
-    [RequireComponent(typeof(ModularAvatarBoneProxy))]
     public abstract class SPSforNDMFTagComponent : MonoBehaviour, VRC.SDKBase.IEditorOnly
     {
         [NonSerialized] public bool forceActive = false;
