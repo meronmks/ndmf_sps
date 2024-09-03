@@ -7,8 +7,7 @@ namespace com.meronmks.ndmfsps.runtime
     [Serializable]
     public class DepthAction
     {
-        [SerializeReference, SubclassSelector]
-        public List<IAction> actions = new ();
+        [SerializeReference, SubclassSelector(typeof(IAction))] public List<IAction> actions = new ();
         public float startDistance = 0;
         public float endDistance = -0.25f;
         public bool enableSelf;

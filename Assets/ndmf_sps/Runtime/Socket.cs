@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace com.meronmks.ndmfsps.runtime
@@ -14,8 +15,7 @@ namespace com.meronmks.ndmfsps.runtime
 
         public SocketMode mode;
         public bool enableActiveAnimation;
-        [SerializeReference, SubclassSelector]
-        public List<IAction> activeAnimationActions = new ();
+        [SerializeReference, SubclassSelector(typeof(IAction))] public List<IAction> activeAnimationActions = new ();
 
         public enum Haptics
         {

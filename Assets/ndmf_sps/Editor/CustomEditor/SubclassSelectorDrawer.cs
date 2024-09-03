@@ -41,7 +41,8 @@ namespace com.meronmks.ndmfsps
 	    private void Initialize(SerializedProperty property)
 	    {
 	        SubclassSelectorAttribute utility = (SubclassSelectorAttribute)attribute;
-	        GetAllInheritedTypes(GetType(property), utility.IsIncludeMono());
+	        // 元実装の自動取得だと稀に壊れるパターンがあるのであえて型を指定する方法で回避
+	        GetAllInheritedTypes(utility.GetFieldType(), false);
 	        GetInheritedTypeNameArrays();
 	    }
 

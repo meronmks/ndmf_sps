@@ -10,16 +10,16 @@ namespace com.meronmks.ndmfsps.runtime
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     public class SubclassSelectorAttribute : PropertyAttribute
     {
-        bool m_includeMono;
+        Type m_type;
 
-        public SubclassSelectorAttribute(bool includeMono = false)
+        public SubclassSelectorAttribute(System.Type type)
         {
-            m_includeMono = includeMono;
+            m_type = type;
         }
 
-        public bool IsIncludeMono()
+        public Type GetFieldType()
         {
-            return m_includeMono;
+            return m_type;
         }
     }
 }
