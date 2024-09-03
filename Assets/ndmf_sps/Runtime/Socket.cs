@@ -14,7 +14,8 @@ namespace com.meronmks.ndmfsps.runtime
 
         public SocketMode mode;
         public bool enableActiveAnimation;
-        public List<Action> activeAnimationActions = new List<Action>();
+        [SerializeReference, SubclassSelector]
+        public List<IAction> activeAnimationActions = new ();
 
         public enum Haptics
         {
