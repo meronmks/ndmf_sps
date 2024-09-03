@@ -2,5 +2,15 @@
   "Language": "日本語 (日本)",
   
   "inspector.common.boneReference": "配置先ボーン",
-  "inspector.common.attachmentMode": "配置モード"
+  "inspector.common.attachmentMode": "配置モード",
+  "inspector.common.attachmentMode.asChildAtRoot": "子として・ルートに配置",
+  "inspector.common.attachmentMode.asChildKeepWorldPose": "子として・ワールド位置と向きを維持",
+  "inspector.common.attachmentMode.asChildKeepPosition": "子として・ワールド位置を維持",
+  "inspector.common.attachmentMode.asChildKeepRotation": "子として・ワールド向きを維持",
+  "inspector.common.enableDepthAnimations": "位置によるアクションを有効にする",
+  "inspector.common.depthActions": "アクション一覧",
+  "inspector.socket.mode": "モード",
+  "inspector.socket.enableActiveAnimation": "ソケット有効時に同時にアクションを起こす",
+  "inspector.socket.activeAnimationActions": "アクション一覧",
+  "inspector.socket.haptics": "ハプティック"
 }

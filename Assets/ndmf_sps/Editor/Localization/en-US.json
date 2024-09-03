@@ -2,5 +2,15 @@
   "Language": "English (United States)",
 
   "inspector.common.boneReference": "Bone reference",
-  "inspector.common.attachmentMode": "Attachment mode"
+  "inspector.common.attachmentMode": "Attachment mode",
+  "inspector.common.attachmentMode.asChildAtRoot": "As child; at root",
+  "inspector.common.attachmentMode.asChildKeepWorldPose": "As child; keep position and rotation",
+  "inspector.common.attachmentMode.asChildKeepPosition": "As child; keep position",
+  "inspector.common.attachmentMode.asChildKeepRotation": "As child; keep rotation",
+  "inspector.common.enableDepthAnimations": "Enable depth actions",
+  "inspector.common.depthActions": "Actions",
+  "inspector.socket.mode": "Mode",
+  "inspector.socket.enableActiveAnimation": "Enable Active actions",
+  "inspector.socket.activeAnimationActions": "Actions",
+  "inspector.socket.haptics": "Haptics"
 }
