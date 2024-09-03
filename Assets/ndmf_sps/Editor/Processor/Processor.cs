@@ -23,14 +23,6 @@ namespace com.meronmks.ndmfsps
 
             foreach (var socket in sockets)
             {
-                var boneProxy = socket.gameObject.GetComponent<ModularAvatarBoneProxy>();
-                if (!boneProxy)
-                {
-                    boneProxy = socket.gameObject.AddComponent<ModularAvatarBoneProxy>();
-                    boneProxy.boneReference = socket.boneReference;
-                    boneProxy.attachmentMode = socket.attachmentMode;
-                }
-
                 SocketProcessor.CreateSender(socket.transform);
                 SocketProcessor.CreateLights(socket.transform, socket.mode);
                 SocketProcessor.CreateHaptics(socket.transform, socket.haptics);

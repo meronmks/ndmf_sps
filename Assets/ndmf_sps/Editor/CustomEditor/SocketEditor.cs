@@ -16,22 +16,6 @@ namespace com.meronmks.ndmfsps
             Localization.SelectLanguageGUI();
             EditorGUILayout.Separator();
             
-            var pBoneProxy = serializedObject.FindProperty(nameof(Socket.boneReference));
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(pBoneProxy, Localization.G("inspector.common.boneReference"));
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedObject.ApplyModifiedProperties();
-            }
-            
-            var pAttachmentMode = serializedObject.FindProperty(nameof(Socket.attachmentMode));
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(pAttachmentMode, Localization.G("inspector.common.attachmentMode"));
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedObject.ApplyModifiedProperties();
-            }
-            
             var pEnableDepthAnimations = serializedObject.FindProperty(nameof(Socket.enableDepthAnimations));
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(pEnableDepthAnimations, Localization.G("inspector.common.enableDepthAnimations"));
