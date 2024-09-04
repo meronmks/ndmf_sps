@@ -9,7 +9,7 @@ SPSをNDMFで使うためのプラグインです。
 2. `ndmf_sps` ディレクトリを使いたいプロジェクトのAssetsディレクトリにコピー
 3. Enjoy!
 
-早い目に[VPM](https://meronmks.github.io/vpm-repos/)に登録する予定です。
+早い目に[VPM](https://meronmks.github.io/vpm/)に登録する予定です。
 
 たぶん。
 
