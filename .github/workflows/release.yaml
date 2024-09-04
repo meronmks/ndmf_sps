@@ -27,21 +27,14 @@ jobs:
             uses: thedoctor0/zip-release@09336613be18a8208dfa66bd57efafd9e2685657
             with:
               type: "zip"
-              directory: "./Assets/ndmf_sps"
+              directory: "./ndmf_sps"
               filename: "../../${{ steps.version.outputs.filename }}.zip" # make the zip file two directories up, since we start two directories in above
           
-          - run: find "./Assets/ndmf_sps" -name \*.meta >> metaList
-          - name: Create UnityPackage
-            uses: pCYSl5EDgo/create-unitypackage@e28c7a4616b2754c564b0a959a03b3c89b756fdb
-            with:
-              package-path: "${{ steps.version.outputs.filename }}.unitypackage"
-              include-files: metaList
           - name: Make Release
             uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
             with:
               tag_name: ${{ steps.version.outputs.prop }}
               files: |
                 ${{ steps.version.outputs.filename }}.zip
-                ${{ steps.version.outputs.filename }}.unitypackage
-                ./Assets/ndmf_sps/package.json
+                ./ndmf_sps/package.json
          
