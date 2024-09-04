@@ -30,10 +30,10 @@ jobs:
             with:
               type: "zip"
               directory: "./ndmf_sps"
-              filename: "../../${{ steps.version.outputs.filename }}.zip" # make the zip file two directories up, since we start two directories in above
+              filename: "../${{ steps.version.outputs.filename }}.zip" # make the zip file two directories up, since we start two directories in above
           
           - name: Make Release
-            uses: softprops/action-gh-release@1e07f4398721186383de40550babbdf2b84acfc5
+            uses: softprops/action-gh-release@v2
             with:
               tag_name: ${{ steps.version.outputs.prop }}
               files: |
