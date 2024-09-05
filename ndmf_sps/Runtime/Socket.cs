@@ -24,5 +24,8 @@ namespace com.meronmks.ndmfsps.runtime
         }
 
         public Haptics haptics;
+
+        public float length;
+        public bool unitsInMeters = true;
     }
 }
