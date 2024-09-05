@@ -3,7 +3,9 @@ using System.Linq;
 using System.Reflection;
 using com.meronmks.ndmfsps.runtime;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /***
  * Original: https://github.com/baba-s/Unity-SerializeReferenceExtensions
@@ -63,8 +65,8 @@ namespace com.meronmks.ndmfsps
 
 	    private void GetInheritedTypeNameArrays()
 	    {
-	        typePopupNameArray = inheritedTypes.Select(type => type == null ? "<null>" : type.ToString()).ToArray();
-	        typeFullNameArray = inheritedTypes.Select(type => type == null ? "" : string.Format("{0} {1}", type.Assembly.ToString().Split(',')[0], type.FullName)).ToArray();
+	        typePopupNameArray = inheritedTypes.Select(type => type == null ? Localization.S("inspector.action.none") : Localization.S(type.ToString())).ToArray();
+	        typeFullNameArray = inheritedTypes.Select(type => type == null ? "None" : string.Format("{0} {1}", type.Assembly.ToString().Split(',')[0], type.FullName)).ToArray();
 	    }
 
 	    public void UpdatePropertyToSelectedTypeIndex(SerializedProperty property, int selectedTypeIndex)
@@ -83,43 +85,6 @@ namespace com.meronmks.ndmfsps
 	        popupPosition.x += EditorGUIUtility.labelWidth;
 	        popupPosition.height = EditorGUIUtility.singleLineHeight;
 	        return popupPosition;
-	    }
-
-	    public static Type GetType( SerializedProperty property )
-	    {
-		    const BindingFlags bindingAttr =
-				    BindingFlags.NonPublic |
-				    BindingFlags.Public |
-				    BindingFlags.FlattenHierarchy |
-				    BindingFlags.Instance
-			    ;
-
-		    var propertyPaths = property.propertyPath.Split( '.' );
-		    var parentType    = property.serializedObject.targetObject.GetType();
-		    var fieldInfo     = parentType.GetField( propertyPaths[ 0 ], bindingAttr );
-		    var fieldType     = fieldInfo.FieldType;
-
-		    // 配列もしくはリストの場合
-		    if ( propertyPaths.Contains( "Array" ) )
-		    {
-			    // 配列の場合
-			    if ( fieldType.IsArray )
-			    {
-				    // GetElementType で要素の型を取得する
-				    var elementType = fieldType.GetElementType();
-				    return elementType;
-			    }
-			    // リストの場合
-			    else
-			    {
-				    // GetGenericArguments で要素の型を取得する
-				    var genericArguments = fieldType.GetGenericArguments();
-				    var elementType      = genericArguments[ 0 ];
-				    return elementType;
-			    }
-		    }
-
-		    return fieldType;
 	    }
 	}
 }
