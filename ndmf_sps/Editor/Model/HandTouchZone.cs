@@ -2,12 +2,12 @@
 using JetBrains.Annotations;
 using VRC.SDK3.Avatars.Components;
 
-namespace com.meronmks.ndmfsps.meronmksTools.ndmf_sps.Editor.Model
+namespace com.meronmks.ndmfsps
 {
-    public class HandTouchZone
+    internal class HandTouchZone
     {
-        public float length { get; private set; }
-        public float radius { get; private set; }
+        internal float length { get; private set; }
+        internal float radius { get; private set; }
 
         HandTouchZone(float length, float radius)
         {
@@ -15,7 +15,7 @@ namespace com.meronmks.ndmfsps.meronmksTools.ndmf_sps.Editor.Model
             this.radius = radius;
         }
 
-        public static HandTouchZone GetHandTouchZoneSize(Socket socket, VRCAvatarDescriptor avatarDescriptor)
+        internal static HandTouchZone GetHandTouchZoneSize(Socket socket, VRCAvatarDescriptor avatarDescriptor)
         {
             bool enableHandTouchZone = socket.haptics == Socket.Haptics.On;
             if (!enableHandTouchZone)

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using com.meronmks.ndmfsps.meronmksTools.ndmf_sps.Editor.Model;
+using com.meronmks.ndmfsps;
 using nadena.dev.ndmf;
 using NUnit.Framework;
 using UnityEditor.Graphs;
@@ -18,7 +18,7 @@ namespace com.meronmks.ndmfsps
     internal static class SocketProcessor
     {
         // SPSシェーダが対象のLightだと判定する色
-        private static Color spsTypeColor = new Color(0, 0, 0, 255);
+        private static Color spsTypeColor = Color.black;
         
         private const string SENDER_PARAMPREFIX = "OGB/Orf/";
         
@@ -26,26 +26,42 @@ namespace com.meronmks.ndmfsps
         /// TPSとSPSで使う何かへのSender
         /// </summary>
         /// <param name="root"></param>
-        internal static void CreateSender(Transform root)
+        internal static void CreateSender(BuildContext ctx, Transform root, Socket socket)
         {
+            var animator = ctx.AvatarRootObject.GetComponent<Animator>();
+            
             var senderObject = Processor.CreateParentGameObject("Senders", root);
             var rootObject = Processor.CreateParentGameObject("Root", senderObject.transform);
             var frontObject = Processor.CreateParentGameObject("Front", senderObject.transform);
 
+            var rootTags = new List<string>();
+            rootTags.Add("TPS_Orf_Root");
+            rootTags.Add("SPSLL_Socket_Root");
+
+            if (socket.mode != Socket.SocketMode.None && !socket.sendersOnly)
+            {
+                switch (socket.mode)
+                {
+                    case Socket.SocketMode.Ring:
+                        rootTags.Add("SPSLL_Socket_Ring");
+                        break;
+                    case Socket.SocketMode.RingOneWay:
+                        rootTags.Add("SPSLL_Socket_Ring");
+                        rootTags.Add("SPSLL_Socket_Hole");
+                        break;
+                    default:
+                        rootTags.Add("SPSLL_Socket_Hole");
+                        break;
+                }
+            }
+            
             Processor.CreateVRCContactSender(rootObject, 
                 ContactBase.ShapeType.Sphere, 
                 0.001f, 
                 Vector3.zero, 
                 Quaternion.identity, 
-                new []
-                {
-                    "TPS_Orf_Root",
-                    "TPS_Orf_Root_SelfNotOnHips",
-                    "SPSLL_Socket_Root",
-                    "SPSLL_Socket_Root_SelfNotOnHips",
-                    "SPSLL_Socket_Hole",
-                    "SPSLL_Socket_Hole_SelfNotOnHips"
-                });
+                rootTags.ToArray(),
+                animator);
             
             Processor.CreateVRCContactSender(frontObject, 
                 ContactBase.ShapeType.Sphere, 
@@ -55,10 +71,9 @@ namespace com.meronmks.ndmfsps
                 new []
                 {
                     "TPS_Orf_Norm",
-                    "TPS_Orf_Norm_SelfNotOnHips",
-                    "SPSLL_Socket_Front",
-                    "SPSLL_Socket_Front_SelfNotOnHips"
-                });
+                    "SPSLL_Socket_Front"
+                },
+                animator);
         }
         
         /// <summary>
@@ -71,10 +86,15 @@ namespace com.meronmks.ndmfsps
             var lightRoot = Processor.CreateParentGameObject("Lights", root);
             var rootObject = Processor.CreateParentGameObject("Root", lightRoot.transform);
             var frontObject = Processor.CreateParentGameObject("Front", lightRoot.transform);
-            frontObject.gameObject.transform.SetLocalPositionAndRotation(Vector3.forward * 0.01f, Quaternion.identity);
+            frontObject.gameObject.transform.SetLocalPositionAndRotation(Vector3.forward * 0.01f / lightRoot.transform.lossyScale.x, Quaternion.identity);
 
             var lightRootComponent = rootObject.AddComponent<Light>();
             var lightFrontComponent = frontObject.AddComponent<Light>();
+
+            lightRootComponent.type = LightType.Point;
+            lightFrontComponent.type = LightType.Point;
+            lightRootComponent.shadows = LightShadows.None;
+            lightFrontComponent.shadows = LightShadows.None;
 
             switch (mode)
             {
@@ -82,6 +102,7 @@ namespace com.meronmks.ndmfsps
                     lightRootComponent.range = 0.4102f;
                     break;
                 case Socket.SocketMode.Ring:
+                case Socket.SocketMode.RingOneWay:
                     lightRootComponent.range = 0.4202f;
                     break;
             }
@@ -99,6 +120,8 @@ namespace com.meronmks.ndmfsps
         /// <param name="root"></param>
         internal static void CreateHaptics(BuildContext ctx, Transform root, Socket socket)
         {
+            var animator = ctx.AvatarRootObject.GetComponent<Animator>();
+            
             var hapticsRoot = Processor.CreateParentGameObject("Haptics", root);
             var penSelfNewRoot = Processor.CreateParentGameObject("PenSelfNewRoot", hapticsRoot.transform);
             var penSelfNewTip = Processor.CreateParentGameObject("PenSelfNewTip", hapticsRoot.transform);
@@ -126,14 +149,11 @@ namespace com.meronmks.ndmfsps
                     true,
                     false,
                     true,
-                    new []
-                    {
-                        "Hand",
-                        "Finger",
-                        "Foot"
-                    },
+                    Processor.selfContacts,
                     ContactReceiver.ReceiverType.Proximity,
-                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelf.name.Replace("/", "_")}");
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelf.name.Replace("/", "_")}",
+                    animator,
+                    Processor.ReceiverParty.Self);
                 
                 Processor.CreateVRCContactReceiver(
                     touchSelfClose,
@@ -145,14 +165,11 @@ namespace com.meronmks.ndmfsps
                     true,
                     false,
                     true,
-                    new []
-                    {
-                        "Hand",
-                        "Finger",
-                        "Foot"
-                    },
+                    Processor.selfContacts,
                     ContactReceiver.ReceiverType.Constant,
-                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelfClose.name.Replace("/", "_")}");
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelfClose.name.Replace("/", "_")}",
+                    animator,
+                    Processor.ReceiverParty.Self);
                 
                 Processor.CreateVRCContactReceiver(
                     touchOthers,
@@ -164,15 +181,11 @@ namespace com.meronmks.ndmfsps
                     false,
                     true,
                     true,
-                    new []
-                    {
-                        "Head",
-                        "Hand",
-                        "Finger",
-                        "Foot"
-                    },
+                    Processor.bodyContacts,
                     ContactReceiver.ReceiverType.Proximity,
-                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthers.name.Replace("/", "_")}");
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthers.name.Replace("/", "_")}",
+                    animator,
+                    Processor.ReceiverParty.Others);
                 
                 Processor.CreateVRCContactReceiver(
                     touchOthersClose,
@@ -184,15 +197,11 @@ namespace com.meronmks.ndmfsps
                     false,
                     true,
                     true,
-                    new []
-                    {
-                        "Head",
-                        "Hand",
-                        "Finger",
-                        "Foot"
-                    },
+                    Processor.bodyContacts,
                     ContactReceiver.ReceiverType.Constant,
-                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthersClose.name.Replace("/", "_")}");
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthersClose.name.Replace("/", "_")}",
+                    animator,
+                    Processor.ReceiverParty.Others);
                 
                 Processor.CreateVRCContactReceiver(
                     penOthers,
@@ -209,7 +218,9 @@ namespace com.meronmks.ndmfsps
                         "TPS_Pen_Penetrating"
                     },
                     ContactReceiver.ReceiverType.Proximity,
-                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthers.name.Replace("/", "_")}");
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthers.name.Replace("/", "_")}",
+                    animator,
+                    Processor.ReceiverParty.Others);
                 
                 Processor.CreateVRCContactReceiver(
                     penOthersClose,
@@ -226,7 +237,9 @@ namespace com.meronmks.ndmfsps
                         "TPS_Pen_Penetrating"
                     },
                     ContactReceiver.ReceiverType.Constant,
-                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersClose.name.Replace("/", "_")}");
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersClose.name.Replace("/", "_")}",
+                    animator,
+                    Processor.ReceiverParty.Others);
                 
                 Processor.CreateVRCContactReceiver(
                     frotOthers,
@@ -243,7 +256,9 @@ namespace com.meronmks.ndmfsps
                         "TPS_Orf_Root"
                     },
                     ContactReceiver.ReceiverType.Proximity,
-                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{frotOthers.name.Replace("/", "_")}");
+                    $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{frotOthers.name.Replace("/", "_")}",
+                    animator,
+                    Processor.ReceiverParty.Others);
             }
             
             Processor.CreateVRCContactReceiver(
@@ -261,7 +276,9 @@ namespace com.meronmks.ndmfsps
                     "TPS_Pen_Root"
                 },
                 ContactReceiver.ReceiverType.Proximity,
-                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penSelfNewRoot.name.Replace("/", "_")}");
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penSelfNewRoot.name.Replace("/", "_")}",
+                animator,
+                Processor.ReceiverParty.Self);
             
             Processor.CreateVRCContactReceiver(
                 penSelfNewTip,
@@ -278,7 +295,9 @@ namespace com.meronmks.ndmfsps
                     "TPS_Pen_Penetrating"
                 },
                 ContactReceiver.ReceiverType.Proximity,
-                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penSelfNewTip.name.Replace("/", "_")}");
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penSelfNewTip.name.Replace("/", "_")}",
+                animator,
+                Processor.ReceiverParty.Self);
             
             Processor.CreateVRCContactReceiver(
                 penOthersNewRoot,
@@ -295,7 +314,9 @@ namespace com.meronmks.ndmfsps
                     "TPS_Pen_Root"
                 },
                 ContactReceiver.ReceiverType.Proximity,
-                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersNewRoot.name.Replace("/", "_")}");
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersNewRoot.name.Replace("/", "_")}",
+                animator,
+                Processor.ReceiverParty.Others);
             
             Processor.CreateVRCContactReceiver(
                 penOthersNewTip,
@@ -312,15 +333,19 @@ namespace com.meronmks.ndmfsps
                     "TPS_Pen_Penetrating"
                 },
                 ContactReceiver.ReceiverType.Proximity,
-                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersNewTip.name.Replace("/", "_")}");
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersNewTip.name.Replace("/", "_")}",
+                animator,
+                Processor.ReceiverParty.Others);
         }
         
         /// <summary>
         /// Plugの位置によってアニメーションさせる奴
         /// </summary>
         /// <param name="root"></param>
-        internal static void CreateAnimations(Transform root, ICollection<DepthAction> actions)
+        internal static void CreateAnimations(BuildContext ctx, Transform root, ICollection<DepthAction> actions)
         {
+            var animator = ctx.AvatarRootObject.GetComponent<Animator>();
+            
             var maxDist = Math.Max(0, actions.Max(a => Math.Max(a.startDistance, a.endDistance)));
             var minDist = Math.Min(0, actions.Min(a => Math.Min(a.startDistance, a.endDistance)));
             var offset = Math.Max(0, -minDist);
@@ -331,6 +356,8 @@ namespace com.meronmks.ndmfsps
             var frontSelfGameObject = Processor.CreateParentGameObject("FrontSelf", outerGameObject.transform);
             var backOthersGameObject = Processor.CreateParentGameObject("BackOthers", outerGameObject.transform);
             var backSelfGameObject = Processor.CreateParentGameObject("BackSelf", outerGameObject.transform);
+            
+            //TODO: 以下の生成がまだ固定値
             Processor.CreateVRCContactReceiver(
                 frontOthersGameObject,
                 ContactBase.ShapeType.Sphere,
@@ -347,7 +374,9 @@ namespace com.meronmks.ndmfsps
                 },
                 ContactReceiver.ReceiverType.Proximity,
                 //TODO: 決まったパラメータはどこから来てるのか調べる。
-                "");
+                "Front",
+                animator,
+                Processor.ReceiverParty.Others);
             Processor.CreateVRCContactReceiver(
                 frontSelfGameObject,
                 ContactBase.ShapeType.Sphere,
@@ -364,7 +393,9 @@ namespace com.meronmks.ndmfsps
                 },
                 ContactReceiver.ReceiverType.Proximity,
                 //TODO: 決まったパラメータはどこから来てるのか調べる。
-                "");
+                "Front",
+                animator,
+                Processor.ReceiverParty.Others);
             Processor.CreateVRCContactReceiver(
                 backOthersGameObject,
                 ContactBase.ShapeType.Sphere,
@@ -381,7 +412,9 @@ namespace com.meronmks.ndmfsps
                 },
                 ContactReceiver.ReceiverType.Proximity,
                 //TODO: 決まったパラメータはどこから来てるのか調べる。
-                "");
+                "Back",
+                animator,
+                Processor.ReceiverParty.Others);
             Processor.CreateVRCContactReceiver(
                 backSelfGameObject,
                 ContactBase.ShapeType.Sphere,
@@ -398,7 +431,9 @@ namespace com.meronmks.ndmfsps
                 },
                 ContactReceiver.ReceiverType.Proximity,
                 //TODO: 決まったパラメータはどこから来てるのか調べる。
-                "");
+                "Back",
+                animator,
+                Processor.ReceiverParty.Others);
             if (minDist < 0)
             {
                 var innerGameObject = Processor.CreateParentGameObject("Inner", animationsRoot.transform);
@@ -422,7 +457,9 @@ namespace com.meronmks.ndmfsps
                     },
                     ContactReceiver.ReceiverType.Proximity,
                     //TODO: 決まったパラメータはどこから来てるのか調べる。
-                    "");
+                    "Front",
+                    animator,
+                    Processor.ReceiverParty.Others);
                 Processor.CreateVRCContactReceiver(
                     frontSelfInnerGameObject,
                     ContactBase.ShapeType.Sphere,
@@ -439,7 +476,9 @@ namespace com.meronmks.ndmfsps
                     },
                     ContactReceiver.ReceiverType.Proximity,
                     //TODO: 決まったパラメータはどこから来てるのか調べる。
-                    "");
+                    "Front",
+                    animator,
+                    Processor.ReceiverParty.Others);
                 Processor.CreateVRCContactReceiver(
                     backOthersInnerGameObject,
                     ContactBase.ShapeType.Sphere,
@@ -456,7 +495,9 @@ namespace com.meronmks.ndmfsps
                     },
                     ContactReceiver.ReceiverType.Proximity,
                     //TODO: 決まったパラメータはどこから来てるのか調べる。
-                    "");
+                    "Back",
+                    animator,
+                    Processor.ReceiverParty.Others);
                 Processor.CreateVRCContactReceiver(
                     backSelfInnerGameObject,
                     ContactBase.ShapeType.Sphere,
@@ -473,7 +514,9 @@ namespace com.meronmks.ndmfsps
                     },
                     ContactReceiver.ReceiverType.Proximity,
                     //TODO: 決まったパラメータはどこから来てるのか調べる。
-                    "");
+                    "Back",
+                    animator,
+                    Processor.ReceiverParty.Others);
             }
         }
         
@@ -481,8 +524,9 @@ namespace com.meronmks.ndmfsps
         /// Plugが接近したら自動でOnになる機能に使われてるっぽい
         /// </summary>
         /// <param name="root"></param>
-        internal static void CreateAutoDistance(Transform root)
+        internal static void CreateAutoDistance(BuildContext ctx, Transform root)
         {
+            var animator = ctx.AvatarRootObject.GetComponent<Animator>();
             var autoDistanceRoot = Processor.CreateParentGameObject("AutoDistance", root);
             var receiverGameObject = Processor.CreateParentGameObject("Receiver", autoDistanceRoot.transform);
             
@@ -502,7 +546,9 @@ namespace com.meronmks.ndmfsps
                 },
                 ContactReceiver.ReceiverType.Proximity,
                 //TODO: 決まったパラメータはどこから来てるのか調べる。
-                "");
+                "",
+                animator,
+                Processor.ReceiverParty.Others);
         }
     }
 }

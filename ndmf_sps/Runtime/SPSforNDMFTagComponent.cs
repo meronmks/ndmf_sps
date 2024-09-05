@@ -10,6 +10,7 @@ namespace com.meronmks.ndmfsps.runtime
         public bool enableDeformation = true;
         public bool enableDepthAnimations = false;
         public List<DepthAction> depthActions = new List<DepthAction>();
+        public bool useHipAvoidance = true;
         void Start(){}
     }
 }

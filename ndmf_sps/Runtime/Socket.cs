@@ -9,8 +9,10 @@ namespace com.meronmks.ndmfsps.runtime
     {
         public enum SocketMode
         {
+            None,
             Hole,
-            Ring
+            Ring,
+            RingOneWay
         }
 
         public SocketMode mode;
@@ -27,5 +29,6 @@ namespace com.meronmks.ndmfsps.runtime
 
         public float length;
         public bool unitsInMeters = true;
+        public bool sendersOnly = false;
     }
 }
