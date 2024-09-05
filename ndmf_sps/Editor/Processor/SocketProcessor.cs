@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using com.meronmks.ndmfsps.meronmksTools.ndmf_sps.Editor.Model;
+using nadena.dev.ndmf;
 using NUnit.Framework;
 using UnityEditor.Graphs;
 using UnityEngine;
@@ -92,10 +94,10 @@ namespace com.meronmks.ndmfsps
         }
 
         /// <summary>
-        /// なんだろ・・・？謎
+        /// 対象の何かが触れたときに発火するHapticsレシーバーたち
         /// </summary>
         /// <param name="root"></param>
-        internal static void CreateHaptics(Transform root, Socket.Haptics haptics)
+        internal static void CreateHaptics(BuildContext ctx, Transform root, Socket socket)
         {
             var hapticsRoot = Processor.CreateParentGameObject("Haptics", root);
             var penSelfNewRoot = Processor.CreateParentGameObject("PenSelfNewRoot", hapticsRoot.transform);
@@ -103,7 +105,8 @@ namespace com.meronmks.ndmfsps
             var penOthersNewRoot = Processor.CreateParentGameObject("PenOthersNewRoot", hapticsRoot.transform);
             var penOthersNewTip = Processor.CreateParentGameObject("PenOthersNewTip", hapticsRoot.transform);
 
-            if (haptics == Socket.Haptics.On)
+            var handTouchZone = HandTouchZone.GetHandTouchZoneSize(socket, ctx.AvatarDescriptor);
+            if (handTouchZone != null)
             {
                 var touchSelf = Processor.CreateParentGameObject("TouchSelf", hapticsRoot.transform);
                 var touchSelfClose = Processor.CreateParentGameObject("TouchSelfClose", hapticsRoot.transform);
@@ -116,9 +119,9 @@ namespace com.meronmks.ndmfsps
                 Processor.CreateVRCContactReceiver(
                     touchSelf,
                     ContactBase.ShapeType.Sphere,
-                    0.052f,
+                    handTouchZone.length,
                     1f,
-                    Vector3.back * 0.052f,
+                    Vector3.forward * -handTouchZone.length,
                     Quaternion.identity,
                     true,
                     false,
@@ -135,9 +138,9 @@ namespace com.meronmks.ndmfsps
                 Processor.CreateVRCContactReceiver(
                     touchSelfClose,
                     ContactBase.ShapeType.Capsule,
-                    0.0208f,
-                    0.052f,
-                    Vector3.back * 0.026f,
+                    handTouchZone.radius,
+                    handTouchZone.length,
+                    Vector3.forward * -(handTouchZone.length/2),
                     Quaternion.Euler(90f,0f,0f),
                     true,
                     false,
@@ -154,9 +157,9 @@ namespace com.meronmks.ndmfsps
                 Processor.CreateVRCContactReceiver(
                     touchOthers,
                     ContactBase.ShapeType.Sphere,
-                    0.052f,
+                    handTouchZone.length,
                     1f,
-                    Vector3.back * 0.052f,
+                    Vector3.forward * -handTouchZone.length,
                     Quaternion.identity,
                     false,
                     true,
@@ -174,9 +177,9 @@ namespace com.meronmks.ndmfsps
                 Processor.CreateVRCContactReceiver(
                     touchOthersClose,
                     ContactBase.ShapeType.Capsule,
-                    0.0208f,
-                    0.052f,
-                    Vector3.back * 0.026f,
+                    handTouchZone.radius,
+                    handTouchZone.length,
+                    Vector3.forward * -(handTouchZone.length/2),
                     Quaternion.Euler(90f,0f,0f),
                     false,
                     true,
@@ -194,9 +197,9 @@ namespace com.meronmks.ndmfsps
                 Processor.CreateVRCContactReceiver(
                     penOthers,
                     ContactBase.ShapeType.Sphere,
-                    0.052f,
+                    handTouchZone.length,
                     1f,
-                    Vector3.back * 0.052f,
+                    Vector3.forward * -handTouchZone.length,
                     Quaternion.identity,
                     false,
                     true,
@@ -211,9 +214,9 @@ namespace com.meronmks.ndmfsps
                 Processor.CreateVRCContactReceiver(
                     penOthersClose,
                     ContactBase.ShapeType.Capsule,
-                    0.0208f,
-                    0.052f,
-                    Vector3.back * 0.026f,
+                    handTouchZone.radius,
+                    handTouchZone.length,
+                    Vector3.forward * -(handTouchZone.length/2),
                     Quaternion.Euler(90f,0f,0f),
                     false,
                     true,
