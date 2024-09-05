@@ -15,7 +15,26 @@ namespace com.meronmks.ndmfsps
             Socket socket = target as Socket;
             Localization.SelectLanguageGUI();
             EditorGUILayout.Separator();
-            
+
+            var pEnableDeformation = serializedObject.FindProperty(nameof(Socket.enableDeformation));
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(pEnableDeformation, Localization.G("inspector.common.enableDeformation"));
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+            }
+
+            if (pEnableDeformation.boolValue)
+            {
+                var pMode = serializedObject.FindProperty(nameof(Socket.mode));
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.PropertyField(pMode, Localization.G("inspector.socket.mode"));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                }
+            }
+
             var pEnableDepthAnimations = serializedObject.FindProperty(nameof(Socket.enableDepthAnimations));
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(pEnableDepthAnimations, Localization.G("inspector.common.enableDepthAnimations"));
@@ -33,14 +52,6 @@ namespace com.meronmks.ndmfsps
                 {
                     serializedObject.ApplyModifiedProperties();
                 }
-            }
-            
-            var pMode = serializedObject.FindProperty(nameof(Socket.mode));
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(pMode, Localization.G("inspector.socket.mode"));
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedObject.ApplyModifiedProperties();
             }
             
             var pEnableActiveAnimation = serializedObject.FindProperty(nameof(Socket.enableActiveAnimation));
