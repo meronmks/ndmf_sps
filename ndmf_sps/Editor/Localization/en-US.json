@@ -1,10 +1,16 @@
 ﻿{
   "Language": "English (United States)",
   
+  "inspector.common.enableDeformation": "Enable deformation",
   "inspector.common.enableDepthAnimations": "Enable depth actions",
   "inspector.common.depthActions": "Actions",
   "inspector.socket.mode": "Mode",
   "inspector.socket.enableActiveAnimation": "Enable Active actions",
   "inspector.socket.activeAnimationActions": "Actions",
-  "inspector.socket.haptics": "Haptics"
+  "inspector.socket.haptics": "Haptics",
+  "inspector.action.none": "None",
+  "inspector.action.objectToggleAction.Obj": "target",
+  "com.meronmks.ndmfsps.runtime.AnimationClipAction": "AnimationClip",
+  "com.meronmks.ndmfsps.runtime.BlendShapeAction": "BlendShape",
+  "com.meronmks.ndmfsps.runtime.ObjectToggleAction": "ObjectToggle"
 }

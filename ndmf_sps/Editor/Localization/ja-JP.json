@@ -1,10 +1,16 @@
 ﻿{
   "Language": "日本語 (日本)",
 
+  "inspector.common.enableDeformation": "変形を有効にする",
   "inspector.common.enableDepthAnimations": "位置によるアクションを有効にする",
   "inspector.common.depthActions": "アクション一覧",
   "inspector.socket.mode": "モード",
   "inspector.socket.enableActiveAnimation": "ソケット有効時に同時にアクションを起こす",
   "inspector.socket.activeAnimationActions": "アクション一覧",
-  "inspector.socket.haptics": "ハプティック"
+  "inspector.socket.haptics": "ハプティック",
+  "inspector.action.none": "None",
+  "inspector.action.objectToggleAction.Obj": "対象のオブジェクト",
+  "com.meronmks.ndmfsps.runtime.AnimationClipAction": "AnimationClip",
+  "com.meronmks.ndmfsps.runtime.BlendShapeAction": "BlendShape",
+  "com.meronmks.ndmfsps.runtime.ObjectToggleAction": "ObjectToggle"
 }
