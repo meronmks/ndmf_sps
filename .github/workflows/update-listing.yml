@@ -17,6 +17,8 @@ concurrency:
 jobs:
   run-repository-dispatch:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Update Listing by Calling Action
         run: |
