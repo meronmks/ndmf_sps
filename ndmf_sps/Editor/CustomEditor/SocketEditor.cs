@@ -26,6 +26,7 @@ namespace com.meronmks.ndmfsps
 
             if (pEnableDeformation.boolValue)
             {
+                EditorGUI.indentLevel++;
                 var pMode = serializedObject.FindProperty(nameof(Socket.mode));
                 EditorGUI.BeginChangeCheck();
                 EditorGUILayout.PropertyField(pMode, Localization.G("inspector.socket.mode"));
@@ -33,6 +34,7 @@ namespace com.meronmks.ndmfsps
                 {
                     serializedObject.ApplyModifiedProperties();
                 }
+                EditorGUI.indentLevel--;
             }
 
             var pEnableDepthAnimations = serializedObject.FindProperty(nameof(Socket.enableDepthAnimations));
@@ -45,6 +47,7 @@ namespace com.meronmks.ndmfsps
 
             if (pEnableDepthAnimations.boolValue)
             {
+                EditorGUI.indentLevel++;
                 var pDepthActions = serializedObject.FindProperty(nameof(Socket.depthActions));
                 EditorGUI.BeginChangeCheck();
                 EditorGUILayout.PropertyField(pDepthActions, Localization.G("inspector.common.depthActions"));
@@ -52,6 +55,7 @@ namespace com.meronmks.ndmfsps
                 {
                     serializedObject.ApplyModifiedProperties();
                 }
+                EditorGUI.indentLevel--;
             }
             
             var pEnableActiveAnimation = serializedObject.FindProperty(nameof(Socket.enableActiveAnimation));
@@ -64,6 +68,7 @@ namespace com.meronmks.ndmfsps
             
             if (pEnableActiveAnimation.boolValue)
             {
+                EditorGUI.indentLevel++;
                 var pActiveAnimationActions = serializedObject.FindProperty(nameof(Socket.activeAnimationActions));
                 EditorGUI.BeginChangeCheck();
                 EditorGUILayout.PropertyField(pActiveAnimationActions, Localization.G("inspector.socket.activeAnimationActions"));
@@ -71,6 +76,7 @@ namespace com.meronmks.ndmfsps
                 {
                     serializedObject.ApplyModifiedProperties();
                 }
+                EditorGUI.indentLevel--;
             }
             
             var pHaptics = serializedObject.FindProperty(nameof(Socket.haptics));
