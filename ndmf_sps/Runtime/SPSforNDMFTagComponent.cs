@@ -11,6 +11,10 @@ namespace com.meronmks.ndmfsps.runtime
         public bool enableDepthAnimations = false;
         public List<DepthAction> depthActions = new List<DepthAction>();
         public bool useHipAvoidance = true;
+        public bool detectLength;
+        public float length;
+        public bool detectRadius;
+        public float radius;
         void Start(){}
     }
 }

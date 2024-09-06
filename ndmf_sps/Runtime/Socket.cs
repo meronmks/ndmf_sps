@@ -26,9 +26,14 @@ namespace com.meronmks.ndmfsps.runtime
         }
 
         public Haptics haptics;
-
-        public float length;
+        
         public bool unitsInMeters = true;
         public bool sendersOnly = false;
+        
+        private void Reset()
+        {
+            detectLength = false;
+            detectRadius = false;
+        }
     }
 }
