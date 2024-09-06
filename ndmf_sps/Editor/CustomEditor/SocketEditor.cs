@@ -9,6 +9,7 @@ namespace com.meronmks.ndmfsps
     [CustomEditor(typeof(Socket))]
     internal class SocketEditor : Editor
     {
+        private bool advancedFoldout;
         public override void OnInspectorGUI()
         {
             serializedObject.UpdateIfRequiredOrScript();
@@ -35,6 +36,7 @@ namespace com.meronmks.ndmfsps
                     serializedObject.ApplyModifiedProperties();
                 }
                 EditorGUI.indentLevel--;
+                EditorGUILayout.Separator();
             }
 
             var pEnableDepthAnimations = serializedObject.FindProperty(nameof(Socket.enableDepthAnimations));
@@ -56,6 +58,7 @@ namespace com.meronmks.ndmfsps
                     serializedObject.ApplyModifiedProperties();
                 }
                 EditorGUI.indentLevel--;
+                EditorGUILayout.Separator();
             }
             
             var pEnableActiveAnimation = serializedObject.FindProperty(nameof(Socket.enableActiveAnimation));
@@ -77,6 +80,7 @@ namespace com.meronmks.ndmfsps
                     serializedObject.ApplyModifiedProperties();
                 }
                 EditorGUI.indentLevel--;
+                EditorGUILayout.Separator();
             }
             
             var pHaptics = serializedObject.FindProperty(nameof(Socket.haptics));
@@ -87,6 +91,26 @@ namespace com.meronmks.ndmfsps
                 serializedObject.ApplyModifiedProperties();
             }
 
+            advancedFoldout = EditorGUILayout.Foldout(advancedFoldout, Localization.G("inspector.common.advancedFoldout"));
+            if (advancedFoldout)
+            {
+                EditorGUI.indentLevel++;
+                var pUseHipAvoidance = serializedObject.FindProperty(nameof(Socket.useHipAvoidance));
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.PropertyField(pUseHipAvoidance, Localization.G("inspector.common.useHipAvoidance"));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                }
+                var pUnitsInMeters = serializedObject.FindProperty(nameof(Socket.unitsInMeters));
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.PropertyField(pUnitsInMeters, Localization.G("inspector.socket.unitsInMeters"));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                }
+                EditorGUI.indentLevel--;
+            }
             serializedObject.ApplyModifiedProperties();
         }
     }
