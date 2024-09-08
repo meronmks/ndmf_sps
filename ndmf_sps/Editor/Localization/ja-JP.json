@@ -1,6 +1,7 @@
 ﻿{
   "Language": "日本語 (日本)",
 
+  "inspector.common.commonInfoMes": "SPSを正しく動作させるにはVRChatの [ピクセルライト数] 設定が [高] に設定してください。\nVRChat設定の [設定] > [グラフィックス] > [詳細設定] > [ピクセルライト数] を [高] に設定してください。",
   "inspector.common.enableDeformation": "変形を有効にする",
   "inspector.common.enableDepthAnimations": "位置によるアクションを有効にする",
   "inspector.common.depthActions": "アクション一覧",
@@ -8,6 +9,7 @@
   "inspector.common.radius": "太さ",
   "inspector.common.advancedFoldout": "詳細設定",
   "inspector.common.useHipAvoidance": "Use hip avoidance",
+  "inspector.common.unitsInMeters": "Units in meters",
   "inspector.socket.mode": "モード",
   "inspector.socket.enableActiveAnimation": "ソケット有効時に同時にアクションを起こす",
   "inspector.socket.activeAnimationActions": "アクション一覧",
@@ -27,7 +29,11 @@
   "inspector.plug.animatedToggle": "Animated toggle",
   "inspector.plug.animatedBlendshapes": "Animated blendshapes to keep while deforming",
   "inspector.plug.allowHoleOverrun": "Holeへのオーバーランを許可する",
+  "inspector.plug.detectTransform4Mesh": "メッシュから positon/rotation を自動設定する",
   "com.meronmks.ndmfsps.runtime.AnimationClipAction": "AnimationClip",
   "com.meronmks.ndmfsps.runtime.BlendShapeAction": "BlendShape",
-  "com.meronmks.ndmfsps.runtime.ObjectToggleAction": "ObjectToggle"
+  "com.meronmks.ndmfsps.runtime.ObjectToggleAction": "ObjectToggle",
+  "ndmf.console.plug.failedToConfigureRenderer": "Rendererの設定に失敗しました",
+  "ndmf.console.plug.unknowRendererType": "不明なRendererの種類です",
+  "ndmf.console.plug.missingMesh": "Meshが見つかりません"
 }

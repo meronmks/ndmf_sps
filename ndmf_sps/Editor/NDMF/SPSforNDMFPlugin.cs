@@ -12,7 +12,7 @@ namespace com.meronmks.ndmfsps
         public override Color? ThemeColor => new Color(0.213f, 0.520f, 0.742f);
         protected override void Configure()
         {
-            // Contactを作る
+            // いろいろ作る
             var generating = InPhase(BuildPhase.Generating).BeforePlugin("nadena.dev.modular-avatar");
             generating.Run("Find SPS for NDMF Components", ctx => Processor.CreateComponent(ctx));
             

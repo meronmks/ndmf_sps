@@ -60,6 +60,11 @@ namespace com.meronmks.ndmfsps
             isLoaded = true;
         }
         
+        internal static string[] GetCodes()
+        {
+            return codes.ToArray();
+        }
+        
         private static int GetIndexByCode(string code)
         {
             var index = codes.IndexOf(code);

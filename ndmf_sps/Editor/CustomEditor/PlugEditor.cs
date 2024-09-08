@@ -13,6 +13,7 @@ namespace com.meronmks.ndmfsps
             serializedObject.UpdateIfRequiredOrScript();
             Plug plug = target as Plug;
             Localization.SelectLanguageGUI();
+            CommonGUI.ShowCommonHelpBox();
             EditorGUILayout.Separator();
 
             var pAutomaticallyFindMesh = serializedObject.FindProperty(nameof(Plug.automaticallyFindMesh));
@@ -37,6 +38,15 @@ namespace com.meronmks.ndmfsps
 
                 EditorGUI.indentLevel--;
                 EditorGUILayout.Separator();
+            }
+            
+            var pDetectTransform4Mesh = serializedObject.FindProperty(nameof(Plug.detectTransform4Mesh));
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(pDetectTransform4Mesh,
+                Localization.G("inspector.plug.detectTransform4Mesh"));
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
             }
 
             var pDetectLength = serializedObject.FindProperty(nameof(Plug.detectLength));

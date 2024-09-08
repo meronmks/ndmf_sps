@@ -1,6 +1,7 @@
 ﻿{
   "Language": "English (United States)",
-  
+
+  "inspector.common.commonInfoMes": "For SPS to work properly, set the Pixel Lights setting in VRChat to High.\nIn VRChat settings, set Settings > Graphics > Advanced > Pixel Lights to High.",
   "inspector.common.enableDeformation": "Enable deformation",
   "inspector.common.enableDepthAnimations": "Enable depth actions",
   "inspector.common.depthActions": "Actions",
@@ -8,6 +9,7 @@
   "inspector.common.radius": "Radius",
   "inspector.common.advancedFoldout": "Advanced",
   "inspector.common.useHipAvoidance": "Use hip avoidance",
+  "inspector.common.unitsInMeters": "Units in meters",
   "inspector.socket.mode": "Mode",
   "inspector.socket.enableActiveAnimation": "Enable Active actions",
   "inspector.socket.activeAnimationActions": "Actions",
@@ -27,7 +29,11 @@
   "inspector.plug.animatedToggle": "Animated toggle",
   "inspector.plug.animatedBlendshapes": "Animated blendshapes to keep while deforming",
   "inspector.plug.allowHoleOverrun": "Allow hole overrun",
+  "inspector.plug.detectTransform4Mesh": "Detect position/rotation from mesh",
   "com.meronmks.ndmfsps.runtime.AnimationClipAction": "AnimationClip",
   "com.meronmks.ndmfsps.runtime.BlendShapeAction": "BlendShape",
-  "com.meronmks.ndmfsps.runtime.ObjectToggleAction": "ObjectToggle"
+  "com.meronmks.ndmfsps.runtime.ObjectToggleAction": "ObjectToggle",
+  "ndmf.console.plug.failedToConfigureRenderer": "Failed to configure renderer",
+  "ndmf.console.plug.unknowRendererType": "Unknown renderer type",
+  "ndmf.console.plug.missingMesh": "Missing mesh"
 }

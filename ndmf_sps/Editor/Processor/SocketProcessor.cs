@@ -26,10 +26,8 @@ namespace com.meronmks.ndmfsps
         /// TPSとSPSで使う何かへのSender
         /// </summary>
         /// <param name="root"></param>
-        internal static void CreateSender(BuildContext ctx, Transform root, Socket socket)
+        internal static void CreateSender(Animator animator, Transform root, Socket socket)
         {
-            var animator = ctx.AvatarRootObject.GetComponent<Animator>();
-            
             var senderObject = Processor.CreateParentGameObject("Senders", root);
             var rootObject = Processor.CreateParentGameObject("Root", senderObject.transform);
             var frontObject = Processor.CreateParentGameObject("Front", senderObject.transform);
@@ -55,16 +53,14 @@ namespace com.meronmks.ndmfsps
                 }
             }
             
-            Processor.CreateVRCContactSender(rootObject, 
-                ContactBase.ShapeType.Sphere, 
+            Processor.CreateVRCContactSender(rootObject,
                 0.001f, 
                 Vector3.zero, 
                 Quaternion.identity, 
                 rootTags.ToArray(),
                 animator);
             
-            Processor.CreateVRCContactSender(frontObject, 
-                ContactBase.ShapeType.Sphere, 
+            Processor.CreateVRCContactSender(frontObject,
                 0.001f, 
                 Vector3.forward * 0.01f, 
                 Quaternion.identity, 
@@ -118,10 +114,8 @@ namespace com.meronmks.ndmfsps
         /// 対象の何かが触れたときに発火するHapticsレシーバーたち
         /// </summary>
         /// <param name="root"></param>
-        internal static void CreateHaptics(BuildContext ctx, Transform root, Socket socket)
+        internal static void CreateHaptics(BuildContext ctx, Animator animator, Transform root, Socket socket)
         {
-            var animator = ctx.AvatarRootObject.GetComponent<Animator>();
-            
             var hapticsRoot = Processor.CreateParentGameObject("Haptics", root);
             var penSelfNewRoot = Processor.CreateParentGameObject("PenSelfNewRoot", hapticsRoot.transform);
             var penSelfNewTip = Processor.CreateParentGameObject("PenSelfNewTip", hapticsRoot.transform);
@@ -141,13 +135,9 @@ namespace com.meronmks.ndmfsps
                 
                 Processor.CreateVRCContactReceiver(
                     touchSelf,
-                    ContactBase.ShapeType.Sphere,
                     handTouchZone.length,
-                    1f,
                     Vector3.forward * -handTouchZone.length,
                     Quaternion.identity,
-                    true,
-                    false,
                     true,
                     Processor.selfContacts,
                     ContactReceiver.ReceiverType.Proximity,
@@ -157,29 +147,22 @@ namespace com.meronmks.ndmfsps
                 
                 Processor.CreateVRCContactReceiver(
                     touchSelfClose,
-                    ContactBase.ShapeType.Capsule,
                     handTouchZone.radius,
-                    handTouchZone.length,
                     Vector3.forward * -(handTouchZone.length/2),
                     Quaternion.Euler(90f,0f,0f),
-                    true,
-                    false,
                     true,
                     Processor.selfContacts,
                     ContactReceiver.ReceiverType.Constant,
                     $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelfClose.name.Replace("/", "_")}",
                     animator,
-                    Processor.ReceiverParty.Self);
+                    Processor.ReceiverParty.Self,
+                    height: handTouchZone.length);
                 
                 Processor.CreateVRCContactReceiver(
                     touchOthers,
-                    ContactBase.ShapeType.Sphere,
                     handTouchZone.length,
-                    1f,
                     Vector3.forward * -handTouchZone.length,
                     Quaternion.identity,
-                    false,
-                    true,
                     true,
                     Processor.bodyContacts,
                     ContactReceiver.ReceiverType.Proximity,
@@ -189,29 +172,22 @@ namespace com.meronmks.ndmfsps
                 
                 Processor.CreateVRCContactReceiver(
                     touchOthersClose,
-                    ContactBase.ShapeType.Capsule,
                     handTouchZone.radius,
-                    handTouchZone.length,
                     Vector3.forward * -(handTouchZone.length/2),
                     Quaternion.Euler(90f,0f,0f),
-                    false,
-                    true,
                     true,
                     Processor.bodyContacts,
                     ContactReceiver.ReceiverType.Constant,
                     $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthersClose.name.Replace("/", "_")}",
                     animator,
-                    Processor.ReceiverParty.Others);
+                    Processor.ReceiverParty.Others,
+                    height: handTouchZone.length);
                 
                 Processor.CreateVRCContactReceiver(
                     penOthers,
-                    ContactBase.ShapeType.Sphere,
                     handTouchZone.length,
-                    1f,
                     Vector3.forward * -handTouchZone.length,
                     Quaternion.identity,
-                    false,
-                    true,
                     true,
                     new []
                     {
@@ -224,13 +200,9 @@ namespace com.meronmks.ndmfsps
                 
                 Processor.CreateVRCContactReceiver(
                     penOthersClose,
-                    ContactBase.ShapeType.Capsule,
                     handTouchZone.radius,
-                    handTouchZone.length,
                     Vector3.forward * -(handTouchZone.length/2),
                     Quaternion.Euler(90f,0f,0f),
-                    false,
-                    true,
                     true,
                     new []
                     {
@@ -239,17 +211,14 @@ namespace com.meronmks.ndmfsps
                     ContactReceiver.ReceiverType.Constant,
                     $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersClose.name.Replace("/", "_")}",
                     animator,
-                    Processor.ReceiverParty.Others);
+                    Processor.ReceiverParty.Others,
+                    height: handTouchZone.length);
                 
                 Processor.CreateVRCContactReceiver(
                     frotOthers,
-                    ContactBase.ShapeType.Sphere,
                     0.1f,
-                    1f,
                     Vector3.forward * 0.05f,
                     Quaternion.identity,
-                    false,
-                    true,
                     true,
                     new []
                     {
@@ -263,13 +232,9 @@ namespace com.meronmks.ndmfsps
             
             Processor.CreateVRCContactReceiver(
                 penSelfNewRoot,
-                ContactBase.ShapeType.Sphere,
-                1f,
                 1f,
                 Vector3.zero,
                 Quaternion.identity,
-                true,
-                false,
                 true,
                 new []
                 {
@@ -282,13 +247,9 @@ namespace com.meronmks.ndmfsps
             
             Processor.CreateVRCContactReceiver(
                 penSelfNewTip,
-                ContactBase.ShapeType.Sphere,
-                1f,
                 1f,
                 Vector3.zero,
                 Quaternion.identity,
-                true,
-                false,
                 true,
                 new []
                 {
@@ -301,13 +262,9 @@ namespace com.meronmks.ndmfsps
             
             Processor.CreateVRCContactReceiver(
                 penOthersNewRoot,
-                ContactBase.ShapeType.Sphere,
-                1f,
                 1f,
                 Vector3.zero,
                 Quaternion.identity,
-                false,
-                true,
                 true,
                 new []
                 {
@@ -320,13 +277,9 @@ namespace com.meronmks.ndmfsps
             
             Processor.CreateVRCContactReceiver(
                 penOthersNewTip,
-                ContactBase.ShapeType.Sphere,
-                1f,
                 1f,
                 Vector3.zero,
                 Quaternion.identity,
-                false,
-                true,
                 true,
                 new []
                 {
@@ -357,16 +310,12 @@ namespace com.meronmks.ndmfsps
             var backOthersGameObject = Processor.CreateParentGameObject("BackOthers", outerGameObject.transform);
             var backSelfGameObject = Processor.CreateParentGameObject("BackSelf", outerGameObject.transform);
             
-            //TODO: 以下の生成がまだ固定値
+            //TODO: 以下の生成がまだ一部固定値
             Processor.CreateVRCContactReceiver(
                 frontOthersGameObject,
-                ContactBase.ShapeType.Sphere,
                 0.03f,
-                1f,
                 Vector3.zero,
                 Quaternion.identity,
-                false,
-                true,
                 false,
                 new []
                 {
@@ -379,13 +328,9 @@ namespace com.meronmks.ndmfsps
                 Processor.ReceiverParty.Others);
             Processor.CreateVRCContactReceiver(
                 frontSelfGameObject,
-                ContactBase.ShapeType.Sphere,
                 0.03f,
-                1f,
                 Vector3.zero,
                 Quaternion.identity,
-                true,
-                false,
                 false,
                 new []
                 {
@@ -398,13 +343,9 @@ namespace com.meronmks.ndmfsps
                 Processor.ReceiverParty.Others);
             Processor.CreateVRCContactReceiver(
                 backOthersGameObject,
-                ContactBase.ShapeType.Sphere,
                 0.03f,
-                1f,
                 Vector3.zero,
                 Quaternion.identity,
-                false,
-                true,
                 false,
                 new []
                 {
@@ -417,13 +358,9 @@ namespace com.meronmks.ndmfsps
                 Processor.ReceiverParty.Others);
             Processor.CreateVRCContactReceiver(
                 backSelfGameObject,
-                ContactBase.ShapeType.Sphere,
                 0.03f,
-                1f,
                 Vector3.zero,
                 Quaternion.identity,
-                true,
-                false,
                 false,
                 new []
                 {
@@ -443,13 +380,9 @@ namespace com.meronmks.ndmfsps
                 var backSelfInnerGameObject = Processor.CreateParentGameObject("BackSelf", innerGameObject.transform);
                 Processor.CreateVRCContactReceiver(
                     frontOthersInnerGameObject,
-                    ContactBase.ShapeType.Sphere,
                     0.03f,
-                    1f,
                     Vector3.zero,
                     Quaternion.identity,
-                    false,
-                    true,
                     false,
                     new []
                     {
@@ -462,13 +395,9 @@ namespace com.meronmks.ndmfsps
                     Processor.ReceiverParty.Others);
                 Processor.CreateVRCContactReceiver(
                     frontSelfInnerGameObject,
-                    ContactBase.ShapeType.Sphere,
                     0.03f,
-                    1f,
                     Vector3.zero,
                     Quaternion.identity,
-                    true,
-                    false,
                     false,
                     new []
                     {
@@ -481,13 +410,9 @@ namespace com.meronmks.ndmfsps
                     Processor.ReceiverParty.Others);
                 Processor.CreateVRCContactReceiver(
                     backOthersInnerGameObject,
-                    ContactBase.ShapeType.Sphere,
                     0.03f,
-                    1f,
                     Vector3.zero,
                     Quaternion.identity,
-                    false,
-                    true,
                     false,
                     new []
                     {
@@ -500,13 +425,9 @@ namespace com.meronmks.ndmfsps
                     Processor.ReceiverParty.Others);
                 Processor.CreateVRCContactReceiver(
                     backSelfInnerGameObject,
-                    ContactBase.ShapeType.Sphere,
                     0.03f,
-                    1f,
                     Vector3.zero,
                     Quaternion.identity,
-                    true,
-                    false,
                     false,
                     new []
                     {
@@ -532,13 +453,9 @@ namespace com.meronmks.ndmfsps
             
             Processor.CreateVRCContactReceiver(
                 receiverGameObject,
-                ContactBase.ShapeType.Sphere,
                 0.3f,
-                1f,
                 Vector3.zero,
                 Quaternion.identity,
-                false,
-                true,
                 false,
                 new []
                 {

@@ -15,6 +15,7 @@ namespace com.meronmks.ndmfsps
             serializedObject.UpdateIfRequiredOrScript();
             Socket socket = target as Socket;
             Localization.SelectLanguageGUI();
+            CommonGUI.ShowCommonHelpBox();
             EditorGUILayout.Separator();
 
             var pEnableDeformation = serializedObject.FindProperty(nameof(Socket.enableDeformation));
@@ -104,7 +105,7 @@ namespace com.meronmks.ndmfsps
                 }
                 var pUnitsInMeters = serializedObject.FindProperty(nameof(Socket.unitsInMeters));
                 EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(pUnitsInMeters, Localization.G("inspector.socket.unitsInMeters"));
+                EditorGUILayout.PropertyField(pUnitsInMeters, Localization.G("inspector.common.unitsInMeters"));
                 if (EditorGUI.EndChangeCheck())
                 {
                     serializedObject.ApplyModifiedProperties();

@@ -15,6 +15,7 @@ namespace com.meronmks.ndmfsps.runtime
         public float length;
         public bool detectRadius;
         public float radius;
+        public bool unitsInMeters = true;
         void Start(){}
     }
 }

@@ -27,7 +27,6 @@ namespace com.meronmks.ndmfsps.runtime
 
         public Haptics haptics;
         
-        public bool unitsInMeters = true;
         public bool sendersOnly = false;
         
         private void Reset()

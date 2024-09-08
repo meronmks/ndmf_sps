@@ -8,7 +8,8 @@ namespace com.meronmks.ndmfsps.runtime
     public class Plug : SPSforNDMFTagComponent
     {
         public bool automaticallyFindMesh = true;
-        public List<MeshRenderer> meshRenderers = new();
+        public List<Renderer> meshRenderers = new();
+        public bool detectTransform4Mesh = true;
         public bool automaticallyMaskUsingBoneWeights = true;
         public Texture2D textureMask = null;
         public bool autoRig = true;
