@@ -3,7 +3,7 @@ name: Update Repo Listing
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: [Build Release]
+    workflows: [release]
     types:
       - completed
   release:
@@ -20,11 +20,8 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Update Listing by Calling Action
-        run: |
-          TOKEN=${{ secrets.VPM_RELEASE_TOKEN }}
-
-          curl -X POST https://api.github.com/repos/meronmks/vpm/dispatches \
-            -H "Authorization: token $TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            -d '{"event_type":"Release","client_payload":{}}'
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          repository: meronmks/vpm
+          event-type: Release
