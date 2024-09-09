@@ -17,11 +17,10 @@ concurrency:
 jobs:
   run-repository-dispatch:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v2
         with:
+          token: ${{ secrets.PAT }}
           repository: meronmks/vpm
           event-type: Release
