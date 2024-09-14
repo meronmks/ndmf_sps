@@ -200,33 +200,173 @@ namespace com.meronmks.ndmfsps
                 touchSelfCloseGO,
                 size.worldRadius+extraRadiusForTouch,
                 Vector3.forward * (size.worldLength / 2),
-                Quaternion.Euler(90,0,0),
                 true,
                 Processor.selfContacts,
-                ContactReceiver.ReceiverType.Constant,
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelfCloseGO.name.Replace("/", "_")}",
                 animator,
                 Processor.ReceiverParty.Self,
-                height: size.worldLength+extraRadiusForTouch*2);
+                receiverType: ContactReceiver.ReceiverType.Constant,
+                height: size.worldLength+extraRadiusForTouch*2,
+                rot: Quaternion.Euler(90,0,0),
+                useHipAvoidance: plug.useHipAvoidance);
             
             var touchSelfGO = Processor.CreateParentGameObject("TouchSelf", hapticsRoot.transform);
             Processor.CreateVRCContactReceiver(
                 touchSelfGO,
                 size.worldRadius+extraRadiusForTouch,
-                Vector3.zero,
-                Quaternion.identity, 
+                Vector3.zero, 
                 true,
                 Processor.selfContacts,
-                ContactReceiver.ReceiverType.Proximity,
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelfGO.name.Replace("/", "_")}",
                 animator,
-                Processor.ReceiverParty.Self);
+                Processor.ReceiverParty.Self,
+                useHipAvoidance: plug.useHipAvoidance);
+            
+            var touchOthersCloseGO = Processor.CreateParentGameObject("TouchOthersClose", hapticsRoot.transform);
+            Processor.CreateVRCContactReceiver(
+                touchOthersCloseGO,
+                size.worldRadius+extraRadiusForTouch,
+                Vector3.forward * (size.worldLength / 2),
+                true,
+                Processor.bodyContacts,
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthersCloseGO.name.Replace("/", "_")}",
+                animator,
+                Processor.ReceiverParty.Others,
+                receiverType: ContactReceiver.ReceiverType.Constant,
+                height: size.worldLength+extraRadiusForTouch*2,
+                useHipAvoidance: plug.useHipAvoidance);
+            
+            var touchOthersGO = Processor.CreateParentGameObject("TouchOthers", hapticsRoot.transform);
+            Processor.CreateVRCContactReceiver(
+                touchOthersGO,
+                size.worldRadius+extraRadiusForTouch,
+                Vector3.zero,
+                true,
+                Processor.bodyContacts,
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthersGO.name.Replace("/", "_")}",
+                animator,
+                Processor.ReceiverParty.Others,
+                useHipAvoidance: plug.useHipAvoidance);
+            
+            var penSelfGO = Processor.CreateParentGameObject("PenSelf", hapticsRoot.transform);
+            Processor.CreateVRCContactReceiver(
+                penSelfGO,
+                size.worldLength,
+                Vector3.zero,
+                true,
+                new []
+                {
+                    "TPS_Orf_Root"
+                },
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penSelfGO.name.Replace("/", "_")}",
+                animator,
+                Processor.ReceiverParty.Self,
+                useHipAvoidance: plug.useHipAvoidance);
+            
+            var penOthersGO = Processor.CreateParentGameObject("PenOthers", hapticsRoot.transform);
+            Processor.CreateVRCContactReceiver(
+                penOthersGO,
+                size.worldLength,
+                Vector3.zero,
+                true,
+                new []
+                {
+                    "TPS_Orf_Root"
+                },
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersGO.name.Replace("/", "_")}",
+                animator,
+                Processor.ReceiverParty.Others,
+                useHipAvoidance: plug.useHipAvoidance);
+            
+            var frotOthersGO = Processor.CreateParentGameObject("FrotOthers", hapticsRoot.transform);
+            Processor.CreateVRCContactReceiver(
+                frotOthersGO,
+                size.worldLength,
+                Vector3.zero,
+                true,
+                new []
+                {
+                    "TPS_Pen_Close"
+                },
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{frotOthersGO.name.Replace("/", "_")}",
+                animator,
+                Processor.ReceiverParty.Others,
+                useHipAvoidance: plug.useHipAvoidance);
+            
+            var frotOthersCloseGO = Processor.CreateParentGameObject("FrotOthersClose", hapticsRoot.transform);
+            Processor.CreateVRCContactReceiver(
+                frotOthersCloseGO,
+                size.worldLength,
+                Vector3.forward * (size.worldLength / 2),
+                true,
+                new []
+                {
+                    "TPS_Pen_Close"
+                },
+                $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{frotOthersCloseGO.name.Replace("/", "_")}",
+                animator,
+                Processor.ReceiverParty.Others,
+                height: size.worldLength,
+                rot: Quaternion.Euler(90,0,0),
+                receiverType: ContactReceiver.ReceiverType.Constant,
+                useHipAvoidance: plug.useHipAvoidance);
         }
 
         internal static void CreateSpsPlus(GameObject root, Plug plug, SpsSize size, Animator animator)
         {
             var spsPlusRoot = Processor.CreateParentGameObject("SpsPlus", root.transform);
-            spsPlusRoot.AddComponent<Animator>(); //一旦消されないようにするため
+
+            const string ringTag = "SPSLL_Socket_Ring";
+            
+            var spsllSocketRingSelfGo = Processor.CreateParentGameObject($"{ringTag}Self", spsPlusRoot.transform);
+            Processor.CreateVRCContactReceiver(
+                spsllSocketRingSelfGo,
+                3f,
+                Vector3.zero,
+                false,
+                new [] {ringTag},
+                $"spsll_{ringTag}_self",
+                animator,
+                Processor.ReceiverParty.Self,
+                useHipAvoidance: plug.useHipAvoidance);
+            
+            var spsllSocketRingOtherGo = Processor.CreateParentGameObject($"{ringTag}Others", spsPlusRoot.transform);
+            Processor.CreateVRCContactReceiver(
+                spsllSocketRingOtherGo,
+                3f,
+                Vector3.zero,
+                false,
+                new [] {ringTag},
+                $"spsll_{ringTag}_others",
+                animator,
+                Processor.ReceiverParty.Others,
+                useHipAvoidance: plug.useHipAvoidance);
+            
+            const string holeTag = "SPSLL_Socket_Hole";
+            
+            var spsllSocketHoleSelfGo = Processor.CreateParentGameObject($"{holeTag}Self", spsPlusRoot.transform);
+            Processor.CreateVRCContactReceiver(
+                spsllSocketHoleSelfGo,
+                3f,
+                Vector3.zero,
+                false,
+                new [] {holeTag},
+                $"spsll_{holeTag}_self",
+                animator,
+                Processor.ReceiverParty.Self,
+                useHipAvoidance: plug.useHipAvoidance);
+            
+            var spsllSocketHoleOtherGo = Processor.CreateParentGameObject($"{holeTag}Others", spsPlusRoot.transform);
+            Processor.CreateVRCContactReceiver(
+                spsllSocketHoleOtherGo,
+                3f,
+                Vector3.zero,
+                false,
+                new [] {holeTag},
+                $"spsll_{holeTag}_others",
+                animator,
+                Processor.ReceiverParty.Others,
+                useHipAvoidance: plug.useHipAvoidance);
         }
 
         internal static SkinnedMeshRenderer CreateNormalizeRenderer(Renderer renderer, GameObject root, float worldLength)
