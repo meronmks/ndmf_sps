@@ -54,9 +54,9 @@ namespace com.meronmks.ndmfsps
                 SocketProcessor.CreateHaptics(ctx, animator, socket.transform, socket);
                 if (socket.enableDepthAnimations)
                 {
-                    SocketProcessor.CreateAnimations(ctx, socket.transform, socket.depthActions);
+                    SocketProcessor.CreateAnimations(ctx, socket.transform, socket);
                 }
-                SocketProcessor.CreateAutoDistance(ctx, socket.transform);
+                SocketProcessor.CreateAutoDistance(ctx, socket);
             }
             
             plugs = ctx.AvatarRootObject.GetComponentsInChildren<Plug>(true);
@@ -113,14 +113,14 @@ namespace com.meronmks.ndmfsps
             GameObject target,
             float radius, 
             Vector3 pos, 
-            Quaternion rot, 
             bool localOnly, 
             string[] collisionTags, 
-            ContactReceiver.ReceiverType receiverType, 
             string parameter,
             Animator animator,
             ReceiverParty party,
             float height = 0,
+            Quaternion rot = default,
+            ContactReceiver.ReceiverType receiverType = ContactReceiver.ReceiverType.Proximity,
             bool worldScale = true,
             bool useHipAvoidance = true)
         {
