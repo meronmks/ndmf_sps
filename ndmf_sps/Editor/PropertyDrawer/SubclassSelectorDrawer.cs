@@ -32,12 +32,33 @@ namespace com.meronmks.ndmfsps
 	        }
 	        int selectedTypeIndex = EditorGUI.Popup(GetPopupPosition(position), currentTypeIndex, typePopupNameArray);
 	        UpdatePropertyToSelectedTypeIndex(property, selectedTypeIndex);
-	        EditorGUI.PropertyField(position, property, label, true);
+	        if (property.managedReferenceValue != null)
+	        {
+		        var drawer = PropertyDrawerDatabase.GetDrawer(property.managedReferenceValue.GetType());
+	        
+		        if (drawer != null)
+		        {
+			        drawer.OnGUI(position, property, label);
+		        }
+		        else
+		        {
+			        EditorGUI.PropertyField(position, property, label, true);
+		        }
+	        }
 	    }
 
 	    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 	    {
-	        return EditorGUI.GetPropertyHeight(property, true);
+		    if (property.managedReferenceValue == null) return EditorGUIUtility.singleLineHeight;
+		    var drawer = PropertyDrawerDatabase.GetDrawer(property.managedReferenceValue.GetType());
+		    if (drawer != null)
+		    {
+			    return drawer.GetPropertyHeight(property, label);
+		    }
+		    else
+		    {
+			    return EditorGUI.GetPropertyHeight(property, true);
+		    }
 	    }
 
 	    private void Initialize(SerializedProperty property)

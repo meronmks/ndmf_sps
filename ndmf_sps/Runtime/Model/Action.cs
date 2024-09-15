@@ -8,7 +8,8 @@ namespace com.meronmks.ndmfsps.runtime
     {
         AnimationClip,
         BlendShape,
-        ObjectToggle
+        ObjectToggle,
+        FxFloat
     }
     
     public interface IAction
@@ -33,7 +34,21 @@ namespace com.meronmks.ndmfsps.runtime
     [Serializable]
     public class ObjectToggleAction : IAction
     {
+        public enum Mode
+        {
+            TurnOn,
+            TurnOff,
+            Toggle
+        }
+        
         public GameObject obj;
-        public bool mode;
+        public Mode mode;
+    }
+
+    [Serializable]
+    public class FxFloatAction : IAction
+    {
+        public string name;
+        public float value = 1f;
     }
 }
