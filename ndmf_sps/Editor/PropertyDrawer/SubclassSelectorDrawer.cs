@@ -35,14 +35,16 @@ namespace com.meronmks.ndmfsps
 	        if (property.managedReferenceValue != null)
 	        {
 		        var drawer = PropertyDrawerDatabase.GetDrawer(property.managedReferenceValue.GetType());
-	        
+
+		        int pos = int.Parse(property.propertyPath.Split('[', ']')[^2]); //^2で最後から2番目の要素らしい
+		        
 		        if (drawer != null)
 		        {
-			        drawer.OnGUI(position, property, label);
+			        drawer.OnGUI(position, property, new GUIContent($"Element {pos}"));
 		        }
 		        else
 		        {
-			        EditorGUI.PropertyField(position, property, label, true);
+			        EditorGUI.PropertyField(position, property, new GUIContent($"Element {pos}"), true);
 		        }
 	        }
 	    }
