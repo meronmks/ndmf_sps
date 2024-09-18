@@ -43,7 +43,11 @@
   "com.meronmks.ndmfsps.runtime.BlendShapeAction.blendShape": "BlendShape名",
   "com.meronmks.ndmfsps.runtime.BlendShapeAction.blendShapeValue": "BlendShapeの値",
   "com.meronmks.ndmfsps.runtime.ObjectToggleAction": "ObjectToggle",
+  "com.meronmks.ndmfsps.runtime.ObjectToggleAction.obj": "対象のオブジェクト",
+  "com.meronmks.ndmfsps.runtime.ObjectToggleAction.mode": "モード",
   "com.meronmks.ndmfsps.runtime.FxFloatAction": "FxFloatAction",
+  "com.meronmks.ndmfsps.runtime.FxFloatAction.name": "Animationパラメータ名",
+  "com.meronmks.ndmfsps.runtime.FxFloatAction.value": "値",
   "ndmf.console.plug.failedToConfigureRenderer": "Rendererの設定に失敗しました",
   "ndmf.console.plug.unknowRendererType": "不明なRendererの種類です",
   "ndmf.console.plug.missingMesh": "Meshが見つかりません"

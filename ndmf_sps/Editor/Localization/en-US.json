@@ -43,7 +43,11 @@
   "com.meronmks.ndmfsps.runtime.BlendShapeAction.blendShape": "BlendShape",
   "com.meronmks.ndmfsps.runtime.BlendShapeAction.blendShapeValue": "Value",
   "com.meronmks.ndmfsps.runtime.ObjectToggleAction": "ObjectToggle",
+  "com.meronmks.ndmfsps.runtime.ObjectToggleAction.obj": "Object",
+  "com.meronmks.ndmfsps.runtime.ObjectToggleAction.mode": "Mode",
   "com.meronmks.ndmfsps.runtime.FxFloatAction": "FxFloatAction",
+  "com.meronmks.ndmfsps.runtime.FxFloatAction.name": "Name",
+  "com.meronmks.ndmfsps.runtime.FxFloatAction.value": "Value",
   "ndmf.console.plug.failedToConfigureRenderer": "Failed to configure renderer",
   "ndmf.console.plug.unknowRendererType": "Unknown renderer type",
   "ndmf.console.plug.missingMesh": "Missing mesh"

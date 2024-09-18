@@ -15,6 +15,8 @@ namespace com.meronmks.ndmfsps
             // クラスと対応するPropertyDrawerを登録しておく
             _drawers.Add(typeof(AnimationClipAction), new AnimationClipActionDrawer());
             _drawers.Add(typeof(BlendShapeAction), new BlendShapeActionDrawer());
+            _drawers.Add(typeof(ObjectToggleAction), new ObjectToggleActionDrawer());
+            _drawers.Add(typeof(FxFloatAction), new FxFloatActionDrawer());
         }
 
         internal static PropertyDrawer GetDrawer(System.Type fieldType)
