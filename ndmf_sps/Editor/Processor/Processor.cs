@@ -5,7 +5,9 @@ using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
 using UnityEngine;
 using VRC.Dynamics;
+using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Dynamics.Contact.Components;
+using VRC.SDKBase;
 using Object = UnityEngine.Object;
 
 namespace com.meronmks.ndmfsps
@@ -83,6 +85,28 @@ namespace com.meronmks.ndmfsps
                         NDMFConsole.LogError("ndmf.console.plug.failedToConfigureRenderer", e);
                     }
                 }
+            }
+        }
+
+        internal static void CreateAnim(BuildContext ctx)
+        {
+            sockets = ctx.AvatarRootObject.GetComponentsInChildren<Socket>(true);
+            
+            foreach (var socket in sockets)
+            {
+                int i = 0;
+                foreach (var depthAction in socket.depthActions)
+                {
+                    SocketProcessor.CreateDepthAnims(ctx, socket, depthAction, i);
+                    i++;
+                }
+            }
+            
+            plugs = ctx.AvatarRootObject.GetComponentsInChildren<Plug>(true);
+
+            foreach (var plug in plugs)
+            {
+
             }
         }
 
@@ -279,6 +303,106 @@ namespace com.meronmks.ndmfsps
                 return Quaternion.LookRotation(new Vector3(c.x, c.y, c.z));
             }
             return Quaternion.identity;
+        }
+
+        internal static (AnimationClip, AnimationClip) CreateAnimationClip(BuildContext ctx, GameObject clipRoot, List<IAction> actions, AnimatorState animatorState)
+        {
+            var onClip = new AnimationClip();
+            var offClip = new AnimationClip();
+
+            onClip.name = "on";
+            offClip.name = "off";
+
+            var firstClip = actions
+                .OfType<AnimationClipAction>()
+                .Select(action => action.clip)
+                .FirstOrDefault();
+
+            if (firstClip)
+            {
+                var copy = Object.Instantiate(firstClip);
+                copy.name = onClip.name;
+                onClip = copy;
+            }
+            
+            foreach (var action in actions)
+            {
+                switch (action)
+                {
+                    case AnimationClipAction clipAction:
+                    {
+                        if (clipAction.clip == null || clipAction.clip == firstClip) break;
+                        var copy = Object.Instantiate(clipAction.clip);
+                        onClip = copy;
+                        
+                        break;
+                    }
+                    case ObjectToggleAction objectToggleAction:
+                    {
+                        if (objectToggleAction.obj == null) break;
+                        var onState = true;
+                        if (objectToggleAction.mode == ObjectToggleAction.Mode.TurnOff)
+                        {
+                            onState = false;
+                        }
+                        else if (objectToggleAction.mode == ObjectToggleAction.Mode.Toggle)
+                        {
+                            onState = !objectToggleAction.obj.activeSelf;
+                        }
+                        
+                        var curveBinding = new EditorCurveBinding();
+
+                        curveBinding.path = clipRoot.name;
+                        curveBinding.type = typeof(GameObject);
+                        curveBinding.propertyName = "m_IsActive";
+
+                        var onCurve = new AnimationCurve();
+                        onCurve.AddKey(0f, onState ? 1 : 0);
+
+                        AnimationUtility.SetEditorCurve(onClip, curveBinding, onCurve);
+                    
+                        var offCurve = new AnimationCurve();
+                        offCurve.AddKey(0f, !onState ? 1 : 0);
+
+                        AnimationUtility.SetEditorCurve(offClip, curveBinding, offCurve);
+                        
+                        break;
+                    }
+                    case BlendShapeAction blendShape:
+                    {
+                        if (string.IsNullOrEmpty(blendShape.blendShape)) break;
+                        foreach (var skin in ctx.AvatarRootObject.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+                        {
+                            if (!blendShape.allRenderers && blendShape.renderer != skin) continue;
+                            if (!(skin.sharedMesh.GetBlendShapeIndex(blendShape.blendShape) >= 0)) continue;
+                            
+                            var curveBinding = new EditorCurveBinding();
+
+                            curveBinding.path = ctx.AvatarRootObject.name;
+                            curveBinding.type = typeof(SkinnedMeshRenderer);
+                            curveBinding.propertyName = $"blendShape.{blendShape.blendShape}";
+
+                            var onCurve = new AnimationCurve();
+                            onCurve.AddKey(0f, blendShape.blendShapeValue);
+
+                            AnimationUtility.SetEditorCurve(onClip, curveBinding, onCurve);
+                        }
+                        break;
+                    }
+                    case FxFloatAction fxFloatAction:
+                    {
+                        if (string.IsNullOrWhiteSpace(fxFloatAction.name)) break;
+                        var parameterDriver = animatorState.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
+                        parameterDriver.parameters.Add(new VRC_AvatarParameterDriver.Parameter()
+                        {
+                            name = fxFloatAction.name,
+                            value = fxFloatAction.value
+                        });
+                        break;
+                    }
+                }
+            }
+            return (onClip, offClip);
         }
     }
 }

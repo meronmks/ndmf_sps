@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using com.meronmks.ndmfsps;
+using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
 using NUnit.Framework;
 using UnityEditor.Graphs;
 using UnityEngine;
 using VRC.Dynamics;
+using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Dynamics.Contact.Components;
 
 namespace com.meronmks.ndmfsps
@@ -451,6 +453,55 @@ namespace com.meronmks.ndmfsps
                 animator,
                 Processor.ReceiverParty.Others,
                 useHipAvoidance: socket.useHipAvoidance);
+        }
+
+        internal static void CreateDepthAnims(BuildContext ctx, Socket socket, DepthAction depthAction, int count)
+        {
+            if (!socket.enableDepthAnimations || socket.depthActions.Count == 0) return;
+            var objectName = socket.gameObject.name.Replace("/", "_");
+            var maMergeAnimator = socket.gameObject.AddComponent<ModularAvatarMergeAnimator>();
+            var controller = new AnimatorController();
+            var emptyClip = new AnimationClip();
+            var parmName = $"{objectName}/Anim{count}/Mapped";
+            
+            emptyClip.name = "Empty";
+            controller.AddParameter(parmName, AnimatorControllerParameterType.Float);
+            controller.AddLayer($"Depth Animation {count} for {objectName}");
+            var layer = controller.layers[0];
+            var stateMachine = layer.stateMachine;
+
+            var offState = stateMachine.AddState("Off");
+            var onState = stateMachine.AddState("On");
+
+            offState.motion = emptyClip;
+            
+            var animClipTuple = Processor.CreateAnimationClip(ctx, socket.gameObject, depthAction.actions, onState);
+            
+            var blendTree = new BlendTree();
+            blendTree.name = $"{objectName}Tree {count}";
+            blendTree.blendType = BlendTreeType.Simple1D;
+            blendTree.blendParameter = parmName;
+            blendTree.useAutomaticThresholds = false;
+            blendTree.AddChild(animClipTuple.Item2, 0f);
+            blendTree.AddChild(animClipTuple.Item1, 1f);
+            
+            onState.motion = blendTree;
+
+            var onTransition = offState.AddTransition(onState);
+            var offTransition = onState.AddTransition(offState);
+            
+            onTransition.AddCondition(AnimatorConditionMode.Greater, 0.01f, parmName);
+            offTransition.AddCondition(AnimatorConditionMode.Less, 0.01f, parmName);
+            onTransition.hasFixedDuration = true;
+            offTransition.hasFixedDuration = true;
+            onTransition.duration = 0f;
+            offTransition.duration = 0f;
+            onTransition.offset = 0f;
+            offTransition.offset = 0f;
+
+            maMergeAnimator.animator = controller;
+            maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            maMergeAnimator.matchAvatarWriteDefaults = true;
         }
     }
 }
