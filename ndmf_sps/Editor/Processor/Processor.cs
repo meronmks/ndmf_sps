@@ -56,7 +56,7 @@ namespace com.meronmks.ndmfsps
                 SocketProcessor.CreateHaptics(ctx, animator, socket.transform, socket);
                 if (socket.enableDepthAnimations)
                 {
-                    SocketProcessor.CreateAnimations(ctx, socket.transform, socket);
+                    SocketProcessor.CreateVRCContacts(ctx, socket.transform, socket);
                 }
                 SocketProcessor.CreateAutoDistance(ctx, socket);
             }

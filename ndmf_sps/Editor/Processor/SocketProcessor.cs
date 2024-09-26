@@ -289,10 +289,10 @@ namespace com.meronmks.ndmfsps
         }
         
         /// <summary>
-        /// Plugの位置によってアニメーションさせる奴
+        /// Plugの位置によって動くContact
         /// </summary>
         /// <param name="root"></param>
-        internal static void CreateAnimations(BuildContext ctx, Transform root, Socket socket)
+        internal static void CreateVRCContacts(BuildContext ctx, Transform root, Socket socket)
         {
             var animator = ctx.AvatarRootObject.GetComponent<Animator>();
             
