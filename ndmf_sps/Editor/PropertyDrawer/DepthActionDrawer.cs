@@ -35,6 +35,7 @@ namespace com.meronmks.ndmfsps
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
+            property.isExpanded = true;
             return PropertyDrawerUtility.GetPropertyHeight(property, label);
         }
     }

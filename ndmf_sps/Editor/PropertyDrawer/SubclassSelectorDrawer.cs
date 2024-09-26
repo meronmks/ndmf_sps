@@ -52,6 +52,7 @@ namespace com.meronmks.ndmfsps
 	    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 	    {
 		    if (property.managedReferenceValue == null) return EditorGUIUtility.singleLineHeight;
+		    property.isExpanded = true;
 		    var drawer = PropertyDrawerDatabase.GetDrawer(property.managedReferenceValue.GetType());
 		    if (drawer != null)
 		    {
