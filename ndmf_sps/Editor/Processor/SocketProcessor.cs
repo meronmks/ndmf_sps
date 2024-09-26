@@ -503,5 +503,44 @@ namespace com.meronmks.ndmfsps
             maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
             maMergeAnimator.matchAvatarWriteDefaults = true;
         }
+
+        internal static void CreateActiveAnimations(BuildContext ctx, Socket socket, List<IAction> actions)
+        {
+            if (!socket.enableActiveAnimation) return;
+            var objectName = socket.gameObject.name.Replace("/", "_");
+            var maMergeAnimator = socket.gameObject.AddComponent<ModularAvatarMergeAnimator>();
+            var controller = new AnimatorController();
+            var parmName = $"{objectName}/SPS/Active"; //TODO: パラメータ名は一旦仮置き
+            
+            controller.AddParameter(parmName, AnimatorControllerParameterType.Bool);
+            controller.AddLayer($"SPS - Active Animation for {objectName}");
+            
+            var layer = controller.layers[0];
+            var stateMachine = layer.stateMachine;
+
+            var offState = stateMachine.AddState("Off");
+            var onState = stateMachine.AddState("On");
+            
+            var animClipTuple = Processor.CreateAnimationClip(ctx, socket.gameObject, actions, onState);
+
+            onState.motion = animClipTuple.Item1;
+            offState.motion = animClipTuple.Item2;
+            
+            var onTransition = offState.AddTransition(onState);
+            var offTransition = onState.AddTransition(offState);
+            
+            onTransition.AddCondition(AnimatorConditionMode.If, 0f, parmName);
+            offTransition.AddCondition(AnimatorConditionMode.IfNot, 0f, parmName);
+            onTransition.hasFixedDuration = true;
+            offTransition.hasFixedDuration = true;
+            onTransition.duration = 0f;
+            offTransition.duration = 0f;
+            onTransition.offset = 0f;
+            offTransition.offset = 0f;
+
+            maMergeAnimator.animator = controller;
+            maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            maMergeAnimator.matchAvatarWriteDefaults = true;
+        }
     }
 }

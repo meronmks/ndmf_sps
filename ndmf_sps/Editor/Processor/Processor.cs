@@ -100,6 +100,8 @@ namespace com.meronmks.ndmfsps
                     SocketProcessor.CreateDepthAnims(ctx, socket, depthAction, i);
                     i++;
                 }
+
+                SocketProcessor.CreateActiveAnimations(ctx, socket, socket.activeAnimationActions);
             }
             
             plugs = ctx.AvatarRootObject.GetComponentsInChildren<Plug>(true);
