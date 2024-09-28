@@ -354,7 +354,7 @@ namespace com.meronmks.ndmfsps
                         
                         var curveBinding = new EditorCurveBinding();
 
-                        curveBinding.path = clipRoot.name;
+                        curveBinding.path = objectToggleAction.obj.name; //TODO: SPSコンポーネントからのパスにした方がいいかも
                         curveBinding.type = typeof(GameObject);
                         curveBinding.propertyName = "m_IsActive";
 
