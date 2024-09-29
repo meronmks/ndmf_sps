@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using nadena.dev.modular_avatar.core;
+using nadena.dev.ndmf;
 using UnityEngine;
 using VRC.Dynamics;
+using VRC.SDK3.Avatars.Components;
 using Object = UnityEngine.Object;
 
 namespace com.meronmks.ndmfsps
@@ -683,6 +686,94 @@ namespace com.meronmks.ndmfsps
             RenderTexture.active = previous;
             RenderTexture.ReleaseTemporary(tmp);
             return myTexture2D;
+        }
+
+        internal static void CreatePostBakeActions(BuildContext ctx, Plug plug, List<IAction> actions)
+        {
+            if (!plug.enableDeformation) return;
+            var objectName = plug.gameObject.name.Replace("/", "_");
+            var maMergeAnimator = plug.gameObject.AddComponent<ModularAvatarMergeAnimator>();
+            var controller = new AnimatorController();
+            var parmName = $"{objectName}/SPS/Active"; //TODO: パラメータ名は一旦仮置き
+            
+            controller.AddParameter(parmName, AnimatorControllerParameterType.Bool);
+            controller.AddLayer($"SPS - Post-Bake Actions for {objectName}");
+            
+            var layer = controller.layers[0];
+            var stateMachine = layer.stateMachine;
+
+            var offState = stateMachine.AddState("Off");
+            var onState = stateMachine.AddState("On");
+            
+            var animClipTuple = Processor.CreateAnimationClip(ctx, plug.gameObject, actions, onState);
+
+            onState.motion = animClipTuple.Item1;
+            offState.motion = animClipTuple.Item2;
+            
+            var onTransition = offState.AddTransition(onState);
+            var offTransition = onState.AddTransition(offState);
+            
+            onTransition.AddCondition(AnimatorConditionMode.If, 0f, parmName);
+            offTransition.AddCondition(AnimatorConditionMode.IfNot, 0f, parmName);
+            onTransition.hasFixedDuration = true;
+            offTransition.hasFixedDuration = true;
+            onTransition.duration = 0f;
+            offTransition.duration = 0f;
+            onTransition.offset = 0f;
+            offTransition.offset = 0f;
+
+            maMergeAnimator.animator = controller;
+            maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            maMergeAnimator.matchAvatarWriteDefaults = true;
+        }
+        
+        internal static void CreateDepthAnims(BuildContext ctx, Plug plug, DepthAction depthAction, int count)
+        {
+            if (!plug.enableDepthAnimations || plug.depthActions.Count == 0) return;
+            var objectName = plug.gameObject.name.Replace("/", "_");
+            var maMergeAnimator = plug.gameObject.AddComponent<ModularAvatarMergeAnimator>();
+            var controller = new AnimatorController();
+            var emptyClip = new AnimationClip();
+            var parmName = $"{objectName}/Anim{count}/Mapped";
+            
+            emptyClip.name = "Empty";
+            controller.AddParameter(parmName, AnimatorControllerParameterType.Float);
+            controller.AddLayer($"Depth Animation {count} for {objectName}");
+            var layer = controller.layers[0];
+            var stateMachine = layer.stateMachine;
+
+            var offState = stateMachine.AddState("Off");
+            var onState = stateMachine.AddState("On");
+
+            offState.motion = emptyClip;
+            
+            var animClipTuple = Processor.CreateAnimationClip(ctx, plug.gameObject, depthAction.actions, onState);
+            
+            var blendTree = new BlendTree();
+            blendTree.name = $"{objectName}Tree {count}";
+            blendTree.blendType = BlendTreeType.Simple1D;
+            blendTree.blendParameter = parmName;
+            blendTree.useAutomaticThresholds = false;
+            blendTree.AddChild(animClipTuple.Item2, 0f);
+            blendTree.AddChild(animClipTuple.Item1, 1f);
+            
+            onState.motion = blendTree;
+
+            var onTransition = offState.AddTransition(onState);
+            var offTransition = onState.AddTransition(offState);
+            
+            onTransition.AddCondition(AnimatorConditionMode.Greater, 0.01f, parmName);
+            offTransition.AddCondition(AnimatorConditionMode.Less, 0.01f, parmName);
+            onTransition.hasFixedDuration = true;
+            offTransition.hasFixedDuration = true;
+            onTransition.duration = 0f;
+            offTransition.duration = 0f;
+            onTransition.offset = 0f;
+            offTransition.offset = 0f;
+
+            maMergeAnimator.animator = controller;
+            maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            maMergeAnimator.matchAvatarWriteDefaults = true;
         }
     }
 }
