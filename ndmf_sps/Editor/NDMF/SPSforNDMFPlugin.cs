@@ -14,13 +14,18 @@ namespace com.meronmks.ndmfsps
         {
             // いろいろ作る
             var generating = InPhase(BuildPhase.Generating).BeforePlugin("nadena.dev.modular-avatar");
-            generating.Run("Find SPS for NDMF Components", ctx => Processor.CreateComponent(ctx));
+            generating.Run("Create SPS Components", ctx => Processor.CreateComponent(ctx));
             
+            var transforming = InPhase(BuildPhase.Transforming).BeforePlugin("nadena.dev.modular-avatar");
             // Animationを作る
+            transforming.Run("Create Animation", ctx => Processor.CreateAnim(ctx));
+            // Menuを作る
+            transforming.Run("Create Menu", ctx => Processor.CreateMenu(ctx));
+
             
             // シェーダーの差し替えとかはMAやTTTの後
-            // var transformingPostProcess = InPhase(BuildPhase.Transforming).AfterPlugin("nadena.dev.modular-avatar");
-            // transformingPostProcess.Run("Remove Component", ctx => Processor.RemoveComponent(ctx));
+            var transformingPostProcess = InPhase(BuildPhase.Transforming).AfterPlugin("nadena.dev.modular-avatar").AfterPlugin("net.rs64.tex-trans-tool");
+            transformingPostProcess.Run("Remove Component", ctx => Processor.RemoveComponent(ctx));
         }
     }
 }

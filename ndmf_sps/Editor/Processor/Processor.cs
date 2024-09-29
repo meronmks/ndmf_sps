@@ -6,6 +6,7 @@ using nadena.dev.ndmf;
 using UnityEngine;
 using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
+using VRC.SDK3.Avatars.ScriptableObjects;
 using VRC.SDK3.Dynamics.Contact.Components;
 using VRC.SDKBase;
 using Object = UnityEngine.Object;
@@ -108,7 +109,50 @@ namespace com.meronmks.ndmfsps
 
             foreach (var plug in plugs)
             {
+                int i = 0;
+                foreach (var depthAction in plug.depthActions)
+                {
+                    PlugProcessor.CreateDepthAnims(ctx, plug, depthAction, i);
+                    i++;
+                }
+                PlugProcessor.CreatePostBakeActions(ctx, plug, plug.postBakeActions);
+            }
+        }
 
+        internal static void CreateMenu(BuildContext ctx)
+        {
+            var spsMenusObjectRoot = new GameObject("SPS");
+            spsMenusObjectRoot.transform.parent = ctx.AvatarRootTransform;
+            spsMenusObjectRoot.AddComponent<ModularAvatarMenuInstaller>();
+            var maRootManuItem = spsMenusObjectRoot.AddComponent<ModularAvatarMenuItem>();
+
+            maRootManuItem.Control = new VRCExpressionsMenu.Control();
+            maRootManuItem.Control.type = VRCExpressionsMenu.Control.ControlType.SubMenu;
+            maRootManuItem.MenuSource = SubmenuSource.Children;
+            spsMenusObjectRoot.AddComponent<ModularAvatarMenuGroup>();
+            sockets = ctx.AvatarRootObject.GetComponentsInChildren<Socket>(true);
+
+            foreach (var socket in sockets)
+            {
+                var objectName = socket.gameObject.name.Replace("/", "_");
+                var socketMenuObject = new GameObject(objectName);
+                socketMenuObject.transform.parent = spsMenusObjectRoot.transform;
+                var maManuItem = socketMenuObject.AddComponent<ModularAvatarMenuItem>();
+                maManuItem.Control = new VRCExpressionsMenu.Control();
+                maManuItem.Control.type = VRCExpressionsMenu.Control.ControlType.Toggle;
+                maManuItem.Control.value = 1f;
+                maManuItem.Control.parameter = new VRCExpressionsMenu.Control.Parameter();
+                maManuItem.Control.parameter.name = $"{objectName}/Socket/Active";
+            }
+            
+            plugs = ctx.AvatarRootObject.GetComponentsInChildren<Plug>(true);
+
+            foreach (var plug in plugs)
+            {
+                var objectName = plug.gameObject.name.Replace("/", "_");
+                var plugMenuObject = new GameObject(objectName);
+                plugMenuObject.transform.parent = spsMenusObjectRoot.transform;
+                // var maManuItem = plugMenuObject.AddComponent<ModularAvatarMenuItem>();
             }
         }
 

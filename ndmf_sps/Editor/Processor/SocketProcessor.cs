@@ -510,7 +510,7 @@ namespace com.meronmks.ndmfsps
             var objectName = socket.gameObject.name.Replace("/", "_");
             var maMergeAnimator = socket.gameObject.AddComponent<ModularAvatarMergeAnimator>();
             var controller = new AnimatorController();
-            var parmName = $"{objectName}/SPS/Active"; //TODO: パラメータ名は一旦仮置き
+            var parmName = $"{objectName}/Socket/Active"; //TODO: パラメータ名は一旦仮置き
             
             controller.AddParameter(parmName, AnimatorControllerParameterType.Bool);
             controller.AddLayer($"SPS - Active Animation for {objectName}");
