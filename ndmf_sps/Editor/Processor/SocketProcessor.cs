@@ -298,10 +298,14 @@ namespace com.meronmks.ndmfsps
             
             var maxDist = Math.Max(0, socket.depthActions.Max(a => Math.Max(a.startDistance, a.endDistance)));
             var minDist = Math.Min(0, socket.depthActions.Min(a => Math.Min(a.startDistance, a.endDistance)));
-            var offset = Math.Max(0, -minDist);
+            // var offset = Math.Max(0, -minDist);
+
+            var cache = new Dictionary<bool, bool>();
 
             foreach (var depthAction in socket.depthActions)
             {
+                if(cache.ContainsKey(depthAction.enableSelf)) continue;
+                cache[depthAction.enableSelf] = true;
                 var animationsRoot = Processor.CreateParentGameObject("Animations", root);
                 var outerGameObject = Processor.CreateParentGameObject("Outer", animationsRoot.transform);
                 var frontOthersGameObject = Processor.CreateParentGameObject("FrontOthers", outerGameObject.transform);
