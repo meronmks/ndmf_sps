@@ -524,6 +524,18 @@ namespace com.meronmks.ndmfsps
 
             var offState = stateMachine.AddState("Off");
             var onState = stateMachine.AddState("On");
+
+            // SocketがON時に有効にするべき奴を全部突っ込んでるがこれでいいかは・・・？
+            foreach (Transform child in socket.transform)
+            {
+                child.gameObject.SetActive(false);
+                if(child.gameObject.name.Equals("AutoDistance")) continue;
+                actions.Add(new ObjectToggleAction
+                {
+                    mode = ObjectToggleAction.Mode.TurnOn,
+                    obj = child.gameObject
+                });
+            }
             
             var animClipTuple = Processor.CreateAnimationClip(ctx, socket.gameObject, actions, onState);
 
