@@ -120,7 +120,7 @@ namespace com.meronmks.ndmfsps
 
         internal static void CreateMenu(BuildContext ctx)
         {
-            if (sockets.Length == 0 || plugs.Length == 0) return;
+            if (sockets.Length == 0 && plugs.Length == 0) return;
             var spsMenusObjectRoot = new GameObject("SPS");
             spsMenusObjectRoot.transform.parent = ctx.AvatarRootTransform;
             spsMenusObjectRoot.AddComponent<ModularAvatarMenuInstaller>();
@@ -143,7 +143,6 @@ namespace com.meronmks.ndmfsps
                 maManuItem.Control.parameter = new VRCExpressionsMenu.Control.Parameter();
                 maManuItem.Control.parameter.name = $"{objectName}/Socket/Active";
             }
-            
             
             foreach (var plug in plugs)
             {
