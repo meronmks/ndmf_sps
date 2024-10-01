@@ -118,9 +118,12 @@ namespace com.meronmks.ndmfsps
             }
         }
 
+        /**
+         * 本家がSocketのみ有効無効のメニュー自動生成っぽいのでそれに合わせる
+         */
         internal static void CreateMenu(BuildContext ctx)
         {
-            if (sockets.Length == 0 && plugs.Length == 0) return;
+            if (sockets.Length == 0) return;
             var spsMenusObjectRoot = new GameObject("SPS");
             spsMenusObjectRoot.transform.parent = ctx.AvatarRootTransform;
             spsMenusObjectRoot.AddComponent<ModularAvatarMenuInstaller>();
@@ -142,14 +145,6 @@ namespace com.meronmks.ndmfsps
                 maManuItem.Control.value = 1f;
                 maManuItem.Control.parameter = new VRCExpressionsMenu.Control.Parameter();
                 maManuItem.Control.parameter.name = $"{objectName}/Socket/Active";
-            }
-            
-            foreach (var plug in plugs)
-            {
-                var objectName = plug.gameObject.name.Replace("/", "_");
-                var plugMenuObject = new GameObject(objectName);
-                plugMenuObject.transform.parent = spsMenusObjectRoot.transform;
-                // var maManuItem = plugMenuObject.AddComponent<ModularAvatarMenuItem>();
             }
         }
 

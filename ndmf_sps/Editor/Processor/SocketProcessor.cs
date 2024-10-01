@@ -510,31 +510,38 @@ namespace com.meronmks.ndmfsps
 
         internal static void CreateActiveAnimations(BuildContext ctx, Socket socket, List<IAction> actions)
         {
-            if (!socket.enableActiveAnimation) return;
+            if (!socket.enableActiveAnimation)
+            {
+                actions = new List<IAction>();
+            }
             var objectName = socket.gameObject.name.Replace("/", "_");
             var maMergeAnimator = socket.gameObject.AddComponent<ModularAvatarMergeAnimator>();
             var controller = new AnimatorController();
             var parmName = $"{objectName}/Socket/Active"; //TODO: パラメータ名は一旦仮置き
             
             controller.AddParameter(parmName, AnimatorControllerParameterType.Bool);
-            controller.AddLayer($"SPS - Active Animation for {objectName}");
+            controller.AddLayer($"SPS - Socket - Active Animation for {objectName}");
             
             var layer = controller.layers[0];
             var stateMachine = layer.stateMachine;
 
             var offState = stateMachine.AddState("Off");
             var onState = stateMachine.AddState("On");
-
-            // SocketがON時に有効にするべき奴を全部突っ込んでるがこれでいいかは・・・？
+            
             foreach (Transform child in socket.transform)
             {
                 child.gameObject.SetActive(false);
-                if(child.gameObject.name.Equals("AutoDistance")) continue;
-                actions.Add(new ObjectToggleAction
+                if (child.gameObject.name.Equals("Senders") ||
+                    child.gameObject.name.Equals("Lights") ||
+                    child.gameObject.name.Equals("Haptics") ||
+                    child.gameObject.name.Equals("Animations"))
                 {
-                    mode = ObjectToggleAction.Mode.TurnOn,
-                    obj = child.gameObject
-                });
+                    actions.Add(new ObjectToggleAction
+                    {
+                        mode = ObjectToggleAction.Mode.TurnOn,
+                        obj = child.gameObject
+                    });
+                }
             }
             
             var animClipTuple = Processor.CreateAnimationClip(ctx, socket.gameObject, actions, onState);
