@@ -44,12 +44,17 @@ namespace com.meronmks.ndmfsps
             Others,
             Both
         }
+
+        internal static void FindSpsComponents(BuildContext ctx)
+        {
+            sockets = ctx.AvatarRootObject.GetComponentsInChildren<Socket>(true);
+            plugs = ctx.AvatarRootObject.GetComponentsInChildren<Plug>(true);
+        }
         
         internal static void CreateComponent(BuildContext ctx)
         {
             var animator = ctx.AvatarRootObject.GetComponent<Animator>();
             
-            sockets = ctx.AvatarRootObject.GetComponentsInChildren<Socket>(true);
             foreach (var socket in sockets)
             {
                 SocketProcessor.CreateSender(animator, socket.transform, socket);
@@ -62,8 +67,6 @@ namespace com.meronmks.ndmfsps
                 SocketProcessor.CreateAutoDistance(ctx, socket);
             }
             
-            plugs = ctx.AvatarRootObject.GetComponentsInChildren<Plug>(true);
-
             foreach (var plug in plugs)
             {
                 var size = PlugProcessor.GetWorldSize(plug);
@@ -91,8 +94,6 @@ namespace com.meronmks.ndmfsps
 
         internal static void CreateAnim(BuildContext ctx)
         {
-            sockets = ctx.AvatarRootObject.GetComponentsInChildren<Socket>(true);
-            
             foreach (var socket in sockets)
             {
                 int i = 0;
@@ -105,8 +106,6 @@ namespace com.meronmks.ndmfsps
                 SocketProcessor.CreateActiveAnimations(ctx, socket, socket.activeAnimationActions);
             }
             
-            plugs = ctx.AvatarRootObject.GetComponentsInChildren<Plug>(true);
-
             foreach (var plug in plugs)
             {
                 int i = 0;
@@ -121,6 +120,7 @@ namespace com.meronmks.ndmfsps
 
         internal static void CreateMenu(BuildContext ctx)
         {
+            if (sockets.Length == 0 || plugs.Length == 0) return;
             var spsMenusObjectRoot = new GameObject("SPS");
             spsMenusObjectRoot.transform.parent = ctx.AvatarRootTransform;
             spsMenusObjectRoot.AddComponent<ModularAvatarMenuInstaller>();
@@ -130,8 +130,7 @@ namespace com.meronmks.ndmfsps
             maRootManuItem.Control.type = VRCExpressionsMenu.Control.ControlType.SubMenu;
             maRootManuItem.MenuSource = SubmenuSource.Children;
             spsMenusObjectRoot.AddComponent<ModularAvatarMenuGroup>();
-            sockets = ctx.AvatarRootObject.GetComponentsInChildren<Socket>(true);
-
+            
             foreach (var socket in sockets)
             {
                 var objectName = socket.gameObject.name.Replace("/", "_");
@@ -145,8 +144,7 @@ namespace com.meronmks.ndmfsps
                 maManuItem.Control.parameter.name = $"{objectName}/Socket/Active";
             }
             
-            plugs = ctx.AvatarRootObject.GetComponentsInChildren<Plug>(true);
-
+            
             foreach (var plug in plugs)
             {
                 var objectName = plug.gameObject.name.Replace("/", "_");

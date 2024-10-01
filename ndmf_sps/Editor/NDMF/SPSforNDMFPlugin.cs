@@ -14,7 +14,8 @@ namespace com.meronmks.ndmfsps
         {
             // いろいろ作る
             var generating = InPhase(BuildPhase.Generating).BeforePlugin("nadena.dev.modular-avatar");
-            generating.Run("Create SPS Components", ctx => Processor.CreateComponent(ctx));
+            generating.Run("Find SPS Components", ctx => Processor.FindSpsComponents(ctx));
+            generating.Run("Create Components", ctx => Processor.CreateComponent(ctx));
             
             var transforming = InPhase(BuildPhase.Transforming).BeforePlugin("nadena.dev.modular-avatar");
             // Animationを作る
