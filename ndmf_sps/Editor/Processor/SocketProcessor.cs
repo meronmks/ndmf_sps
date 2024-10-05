@@ -139,24 +139,24 @@ namespace com.meronmks.ndmfsps
                     touchSelf,
                     handTouchZone.length,
                     Vector3.forward * -handTouchZone.length,
-                    true,
                     Processor.selfContacts,
                     $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelf.name.Replace("/", "_")}",
                     animator,
                     Processor.ReceiverParty.Self,
+                    localOnly: true,
                     useHipAvoidance: socket.useHipAvoidance);
                 
                 Processor.CreateVRCContactReceiver(
                     touchSelfClose,
                     handTouchZone.radius,
                     Vector3.forward * -(handTouchZone.length/2),
-                    true,
                     Processor.selfContacts,
                     $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelfClose.name.Replace("/", "_")}",
                     animator,
                     Processor.ReceiverParty.Self,
                     receiverType: ContactReceiver.ReceiverType.Constant,
                     height: handTouchZone.length,
+                    localOnly: true,
                     rot: Quaternion.Euler(90,0,0),
                     useHipAvoidance: socket.useHipAvoidance);
                 
@@ -164,23 +164,23 @@ namespace com.meronmks.ndmfsps
                     touchOthers,
                     handTouchZone.length,
                     Vector3.forward * -handTouchZone.length,
-                    true,
                     Processor.bodyContacts,
                     $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthers.name.Replace("/", "_")}",
                     animator,
                     Processor.ReceiverParty.Others,
+                    localOnly: true,
                     useHipAvoidance: socket.useHipAvoidance);
                 
                 Processor.CreateVRCContactReceiver(
                     touchOthersClose,
                     handTouchZone.radius,
                     Vector3.forward * -(handTouchZone.length/2),
-                    true,
                     Processor.bodyContacts,
                     $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthersClose.name.Replace("/", "_")}",
                     animator,
                     Processor.ReceiverParty.Others,
                     receiverType: ContactReceiver.ReceiverType.Constant,
+                    localOnly: true,
                     height: handTouchZone.length,
                     rot: Quaternion.Euler(90,0,0),
                     useHipAvoidance: socket.useHipAvoidance);
@@ -189,7 +189,6 @@ namespace com.meronmks.ndmfsps
                     penOthers,
                     handTouchZone.length,
                     Vector3.forward * -handTouchZone.length,
-                    true,
                     new []
                     {
                         "TPS_Pen_Penetrating"
@@ -197,13 +196,13 @@ namespace com.meronmks.ndmfsps
                     $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthers.name.Replace("/", "_")}",
                     animator,
                     Processor.ReceiverParty.Others,
+                    localOnly: true,
                     useHipAvoidance: socket.useHipAvoidance);
                 
                 Processor.CreateVRCContactReceiver(
                     penOthersClose,
                     handTouchZone.radius,
                     Vector3.forward * -(handTouchZone.length/2),
-                    true,
                     new []
                     {
                         "TPS_Pen_Penetrating"
@@ -212,6 +211,7 @@ namespace com.meronmks.ndmfsps
                     animator,
                     Processor.ReceiverParty.Others,
                     receiverType: ContactReceiver.ReceiverType.Constant,
+                    localOnly: true,
                     height: handTouchZone.length,
                     rot: Quaternion.Euler(90,0,0),
                     useHipAvoidance: socket.useHipAvoidance);
@@ -220,7 +220,6 @@ namespace com.meronmks.ndmfsps
                     frotOthers,
                     0.1f,
                     Vector3.forward * 0.05f,
-                    true,
                     new []
                     {
                         "TPS_Orf_Root"
@@ -228,6 +227,7 @@ namespace com.meronmks.ndmfsps
                     $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{frotOthers.name.Replace("/", "_")}",
                     animator,
                     Processor.ReceiverParty.Others,
+                    localOnly: true,
                     useHipAvoidance: socket.useHipAvoidance);
             }
             
@@ -235,7 +235,6 @@ namespace com.meronmks.ndmfsps
                 penSelfNewRoot,
                 1f,
                 Vector3.zero,
-                true,
                 new []
                 {
                     "TPS_Pen_Root"
@@ -243,13 +242,13 @@ namespace com.meronmks.ndmfsps
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penSelfNewRoot.name.Replace("/", "_")}",
                 animator,
                 Processor.ReceiverParty.Self,
+                localOnly: true,
                 useHipAvoidance: socket.useHipAvoidance);
             
             Processor.CreateVRCContactReceiver(
                 penSelfNewTip,
                 1f,
                 Vector3.zero,
-                true,
                 new []
                 {
                     "TPS_Pen_Penetrating"
@@ -257,13 +256,13 @@ namespace com.meronmks.ndmfsps
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penSelfNewTip.name.Replace("/", "_")}",
                 animator,
                 Processor.ReceiverParty.Self,
+                localOnly: true,
                 useHipAvoidance: socket.useHipAvoidance);
             
             Processor.CreateVRCContactReceiver(
                 penOthersNewRoot,
                 1f,
                 Vector3.zero,
-                true,
                 new []
                 {
                     "TPS_Pen_Root"
@@ -271,13 +270,13 @@ namespace com.meronmks.ndmfsps
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersNewRoot.name.Replace("/", "_")}",
                 animator,
                 Processor.ReceiverParty.Others,
+                localOnly: true,
                 useHipAvoidance: socket.useHipAvoidance);
             
             Processor.CreateVRCContactReceiver(
                 penOthersNewTip,
                 1f,
                 Vector3.zero,
-                true,
                 new []
                 {
                     "TPS_Pen_Penetrating"
@@ -285,6 +284,7 @@ namespace com.meronmks.ndmfsps
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersNewTip.name.Replace("/", "_")}",
                 animator,
                 Processor.ReceiverParty.Others,
+                localOnly: true,
                 useHipAvoidance: socket.useHipAvoidance);
         }
         
@@ -320,7 +320,6 @@ namespace com.meronmks.ndmfsps
                     frontOthersGameObject,
                     outerRadius,
                     Vector3.zero,
-                    false,
                     new []
                     {
                         "TPS_Pen_Penetrating"
@@ -333,7 +332,6 @@ namespace com.meronmks.ndmfsps
                     frontSelfGameObject,
                     outerRadius,
                     Vector3.zero,
-                    false,
                     new []
                     {
                         "TPS_Pen_Penetrating"
@@ -346,7 +344,6 @@ namespace com.meronmks.ndmfsps
                     backOthersGameObject,
                     outerRadius,
                     Vector3.zero + Vector3.forward * -0.01f,
-                    false,
                     new []
                     {
                         "TPS_Pen_Penetrating"
@@ -359,7 +356,6 @@ namespace com.meronmks.ndmfsps
                     backSelfGameObject,
                     outerRadius,
                     Vector3.zero + Vector3.forward * -0.01f,
-                    false,
                     new []
                     {
                         "TPS_Pen_Penetrating"
@@ -382,7 +378,6 @@ namespace com.meronmks.ndmfsps
                         frontOthersInnerGameObject,
                         -minDist,
                         posOffset,
-                        false,
                         new []
                         {
                             "TPS_Pen_Penetrating"
@@ -395,7 +390,6 @@ namespace com.meronmks.ndmfsps
                         frontSelfInnerGameObject,
                         -minDist,
                         posOffset,
-                        false,
                         new []
                         {
                             "TPS_Pen_Penetrating"
@@ -408,7 +402,6 @@ namespace com.meronmks.ndmfsps
                         backOthersInnerGameObject,
                         -minDist,
                         posOffset + Vector3.forward * -0.01f,
-                        false,
                         new []
                         {
                             "TPS_Pen_Penetrating"
@@ -421,7 +414,6 @@ namespace com.meronmks.ndmfsps
                         backSelfInnerGameObject,
                         -minDist,
                         posOffset + Vector3.forward * -0.01f,
-                        false,
                         new []
                         {
                             "TPS_Pen_Penetrating"
@@ -448,7 +440,6 @@ namespace com.meronmks.ndmfsps
                 receiverGameObject,
                 0.3f,
                 Vector3.zero,
-                false,
                 new []
                 {
                     "TPS_Pen_Penetrating"

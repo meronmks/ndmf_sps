@@ -203,12 +203,12 @@ namespace com.meronmks.ndmfsps
                 touchSelfCloseGO,
                 size.worldRadius+extraRadiusForTouch,
                 Vector3.forward * (size.worldLength / 2),
-                true,
                 Processor.selfContacts,
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelfCloseGO.name.Replace("/", "_")}",
                 animator,
                 Processor.ReceiverParty.Self,
                 receiverType: ContactReceiver.ReceiverType.Constant,
+                localOnly: true,
                 height: size.worldLength+extraRadiusForTouch*2,
                 rot: Quaternion.Euler(90,0,0),
                 useHipAvoidance: plug.useHipAvoidance);
@@ -218,11 +218,11 @@ namespace com.meronmks.ndmfsps
                 touchSelfGO,
                 size.worldRadius+extraRadiusForTouch,
                 Vector3.zero, 
-                true,
                 Processor.selfContacts,
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelfGO.name.Replace("/", "_")}",
                 animator,
                 Processor.ReceiverParty.Self,
+                localOnly: true,
                 useHipAvoidance: plug.useHipAvoidance);
             
             var touchOthersCloseGO = Processor.CreateParentGameObject("TouchOthersClose", hapticsRoot.transform);
@@ -230,12 +230,12 @@ namespace com.meronmks.ndmfsps
                 touchOthersCloseGO,
                 size.worldRadius+extraRadiusForTouch,
                 Vector3.forward * (size.worldLength / 2),
-                true,
                 Processor.bodyContacts,
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthersCloseGO.name.Replace("/", "_")}",
                 animator,
                 Processor.ReceiverParty.Others,
                 receiverType: ContactReceiver.ReceiverType.Constant,
+                localOnly: true,
                 height: size.worldLength+extraRadiusForTouch*2,
                 useHipAvoidance: plug.useHipAvoidance);
             
@@ -244,11 +244,11 @@ namespace com.meronmks.ndmfsps
                 touchOthersGO,
                 size.worldRadius+extraRadiusForTouch,
                 Vector3.zero,
-                true,
                 Processor.bodyContacts,
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthersGO.name.Replace("/", "_")}",
                 animator,
                 Processor.ReceiverParty.Others,
+                localOnly: true,
                 useHipAvoidance: plug.useHipAvoidance);
             
             var penSelfGO = Processor.CreateParentGameObject("PenSelf", hapticsRoot.transform);
@@ -256,7 +256,6 @@ namespace com.meronmks.ndmfsps
                 penSelfGO,
                 size.worldLength,
                 Vector3.zero,
-                true,
                 new []
                 {
                     "TPS_Orf_Root"
@@ -264,6 +263,7 @@ namespace com.meronmks.ndmfsps
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penSelfGO.name.Replace("/", "_")}",
                 animator,
                 Processor.ReceiverParty.Self,
+                localOnly: true,
                 useHipAvoidance: plug.useHipAvoidance);
             
             var penOthersGO = Processor.CreateParentGameObject("PenOthers", hapticsRoot.transform);
@@ -271,7 +271,6 @@ namespace com.meronmks.ndmfsps
                 penOthersGO,
                 size.worldLength,
                 Vector3.zero,
-                true,
                 new []
                 {
                     "TPS_Orf_Root"
@@ -279,6 +278,7 @@ namespace com.meronmks.ndmfsps
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{penOthersGO.name.Replace("/", "_")}",
                 animator,
                 Processor.ReceiverParty.Others,
+                localOnly: true,
                 useHipAvoidance: plug.useHipAvoidance);
             
             var frotOthersGO = Processor.CreateParentGameObject("FrotOthers", hapticsRoot.transform);
@@ -286,7 +286,6 @@ namespace com.meronmks.ndmfsps
                 frotOthersGO,
                 size.worldLength,
                 Vector3.zero,
-                true,
                 new []
                 {
                     "TPS_Pen_Close"
@@ -294,6 +293,7 @@ namespace com.meronmks.ndmfsps
                 $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{frotOthersGO.name.Replace("/", "_")}",
                 animator,
                 Processor.ReceiverParty.Others,
+                localOnly: true,
                 useHipAvoidance: plug.useHipAvoidance);
             
             var frotOthersCloseGO = Processor.CreateParentGameObject("FrotOthersClose", hapticsRoot.transform);
@@ -301,7 +301,6 @@ namespace com.meronmks.ndmfsps
                 frotOthersCloseGO,
                 size.worldLength,
                 Vector3.forward * (size.worldLength / 2),
-                true,
                 new []
                 {
                     "TPS_Pen_Close"
@@ -312,6 +311,7 @@ namespace com.meronmks.ndmfsps
                 height: size.worldLength,
                 rot: Quaternion.Euler(90,0,0),
                 receiverType: ContactReceiver.ReceiverType.Constant,
+                localOnly: true,
                 useHipAvoidance: plug.useHipAvoidance);
         }
 
@@ -326,7 +326,6 @@ namespace com.meronmks.ndmfsps
                 spsllSocketRingSelfGo,
                 3f,
                 Vector3.zero,
-                false,
                 new [] {ringTag},
                 $"spsll_{ringTag}_self",
                 animator,
@@ -338,7 +337,6 @@ namespace com.meronmks.ndmfsps
                 spsllSocketRingOtherGo,
                 3f,
                 Vector3.zero,
-                false,
                 new [] {ringTag},
                 $"spsll_{ringTag}_others",
                 animator,
@@ -352,7 +350,6 @@ namespace com.meronmks.ndmfsps
                 spsllSocketHoleSelfGo,
                 3f,
                 Vector3.zero,
-                false,
                 new [] {holeTag},
                 $"spsll_{holeTag}_self",
                 animator,
@@ -364,7 +361,6 @@ namespace com.meronmks.ndmfsps
                 spsllSocketHoleOtherGo,
                 3f,
                 Vector3.zero,
-                false,
                 new [] {holeTag},
                 $"spsll_{holeTag}_others",
                 animator,
