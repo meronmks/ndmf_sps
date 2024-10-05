@@ -83,6 +83,40 @@ namespace com.meronmks.ndmfsps
                     try
                     {
                         var skin = PlugProcessor.CreateNormalizeRenderer(renderer, bakedSpsPlug, size.worldLength);
+                        
+                        var spsBlendshapes = plug.animatedBlendshapes
+                            .Where(b => skin.sharedMesh.GetBlendShapeIndex(b) >= 0)
+                            .Distinct()
+                            .Take(16)
+                            .ToArray();
+
+                        var activeFromMask = PlugProcessor.GetMask(skin, plug);
+                        
+                        //TODO: ここでAutoRig設定？
+                        
+                        var spsBaked = PlugProcessor.BakeTexture2D(skin, activeFromMask, spsBlendshapes);
+                        
+                        foreach (var material in skin.materials)
+                        {
+                            var (newShader, _) = ShaderPatcher.Patch(material.shader);
+                            
+                            material.shader = newShader;
+                            material.SetFloat("_SPS_Enabled", plug.animatedToggle ? 1f : 0f);
+                            bakedSpsPlug.SetActive(plug.animatedToggle);
+                            material.SetFloat("_SPS_Length", size.worldLength);
+                            material.SetFloat("_SPS_BakedLength", size.worldLength);
+                            material.SetFloat("_SPS_Overrun", plug.allowHoleOverrun ? 1f : 0f);
+                            material.SetTexture("_SPS_Bake", spsBaked);
+                            material.SetFloat("_SPS_BlendshapeCount", spsBlendshapes.Length);
+                            material.SetFloat("_SPS_BlendshapeVertCount", skin.sharedMesh.vertexCount);
+                            for (var i = 0; i < spsBlendshapes.Length; i++) {
+                                var name = spsBlendshapes[i];
+                                var id = skin.sharedMesh.GetBlendShapeIndex(name);
+                                if (id >= 0) {
+                                    material.SetFloat("_SPS_Blendshape" + i, skin.GetBlendShapeWeight(id));
+                                }
+                            }
+                        }
                     }
                     catch (Exception e)
                     {

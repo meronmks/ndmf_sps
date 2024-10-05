@@ -420,7 +420,7 @@ namespace com.meronmks.ndmfsps
 
             skin.rootBone = root.transform;
 
-            var bakeVertices = GetMeshVertices(skin, skin.rootBone);
+            var (bakeVertices, _, _) = GetMeshVertices(skin, skin.rootBone);
             var bounds = new Bounds();
             foreach (var vertex in bakeVertices)
             {
@@ -449,7 +449,7 @@ namespace com.meronmks.ndmfsps
 
             foreach (var renderer in renderers)
             {
-                var meshVertices = GetMeshVertices(renderer);
+                var (meshVertices, _, _) = GetMeshVertices(renderer);
                 if (meshVertices == null) continue;
                 float[] mask = plug ? GetMask(renderer, plug) : null;
                 var matsUsedVert = new MultiMapHashSet<int, int>();
@@ -511,7 +511,83 @@ namespace com.meronmks.ndmfsps
             return Tuple.Create(lenght, radius, matsUsed);
         }
 
-        private static Vector3[] GetMeshVertices(Renderer renderer, Transform origin = null)
+        internal static Texture2D BakeTexture2D(SkinnedMeshRenderer skin, float[] activeFromMask,
+            ICollection<string> spsBlendshapes = null)
+        {
+            var bakedMesh = GetMeshVertices(skin, skin.rootBone);
+            if (bakedMesh.vertices == null) return null;
+            
+            List<Color32> bakeArray = new List<Color32>();
+            
+            void WriteColor(byte r, byte g, byte b, byte a) {
+                bakeArray.Add(new Color32(r, g, b, a));
+            }
+
+            void WriteFloat(float f) {
+                byte[] bytes = BitConverter.GetBytes(f);
+                WriteColor(bytes[0], bytes[1], bytes[2], bytes[3]);
+            }
+            void WriteVector3(Vector3 v) {
+                WriteFloat(v.x);
+                WriteFloat(v.y);
+                WriteFloat(v.z);
+            }
+            
+            float GetActive(int i) {
+                return activeFromMask == null ? 1 : activeFromMask[i];
+            }
+            
+            WriteColor(0, 0, 0, 0);
+
+            for (var i = 0; i < bakedMesh.vertices.Length; i++)
+            {
+                WriteVector3(bakedMesh.vertices[i]);
+                
+                WriteVector3(i < bakedMesh.normals.Length ? bakedMesh.normals[i] : Vector3.zero);
+                WriteVector3(i < bakedMesh.tangents.Length ? bakedMesh.tangents[i] : Vector3.zero);
+                WriteFloat(GetActive(i));
+            }
+
+            if (spsBlendshapes != null)
+            {
+                foreach (var bs in spsBlendshapes)
+                {
+                    var id = skin.sharedMesh.GetBlendShapeIndex(bs);
+                    var weight = skin.GetBlendShapeWeight(id);
+                    skin.SetBlendShapeWeight(id, 0);
+                    var bsBakedMeshOff = GetMeshVertices(skin, skin.rootBone, true);
+                    skin.SetBlendShapeWeight(id, 100);
+                    var bsBakedMeshOn = GetMeshVertices(skin, skin.rootBone, true);
+                    skin.SetBlendShapeWeight(id, weight);
+                    WriteFloat(weight);
+                    for (var v = 0; v < bsBakedMeshOn.vertices.Length; v++)
+                    {
+                        WriteVector3(bsBakedMeshOn.vertices[v] - bsBakedMeshOff.vertices[v]);
+                        WriteVector3(v < bsBakedMeshOn.normals.Length
+                            ? bsBakedMeshOn.normals[v] - bsBakedMeshOff.normals[v]
+                            : Vector3.zero);
+                        WriteVector3(v < bsBakedMeshOn.tangents.Length
+                            ? bsBakedMeshOn.tangents[v] - bsBakedMeshOff.tangents[v]
+                            : Vector3.zero);
+                    }
+                }
+            }
+
+            var width = 8192;
+            var height = (int)(bakeArray.LongCount() / width) + 1;
+            var tex = new Texture2D(width, height, TextureFormat.RGBA32, false, true);
+            tex.name = "SPS Data";
+            var texArray = tex.GetPixels32();
+            for (var i = 0; i < bakeArray.Count; i++) {
+                texArray[i] = bakeArray[i];
+            }
+            tex.SetPixels32(texArray);
+            tex.Apply(false);
+
+            return tex;
+        }
+
+        private static (Vector3[] vertices, Vector3[] normals, Vector3[] tangents) GetMeshVertices(Renderer renderer, Transform origin = null, bool applyScale = false)
         {
             var mesh = GetMesh(renderer);
 
@@ -531,16 +607,24 @@ namespace com.meronmks.ndmfsps
                 mesh = tempMesh;
             }
 
-            if (mesh == null) return null;
+            if (mesh == null) return (null, null, null);
             
             Vector3[] vertices = mesh.vertices;
+            Vector3[] normals = mesh.normals;
+            Vector3[] tangents = mesh.tangents.Select(t => new Vector3(t.x, t.y, t.z)).ToArray();
 
             if (origin != null)
             {
                 vertices = vertices.Select(v => origin.InverseTransformPoint(renderer.transform.TransformPoint(v))).ToArray();
+                normals = normals.Select(v => origin.InverseTransformDirection(renderer.transform.TransformDirection(v))).ToArray();
+                tangents = tangents.Select(v => origin.InverseTransformDirection(renderer.transform.TransformDirection(v))).ToArray();
             }
             
-            return vertices;
+            if (applyScale && origin != null) {
+                ApplyScale(vertices, origin.lossyScale);
+            }
+            
+            return (vertices, normals, tangents);
         }
 
         private static Mesh GetMesh(Renderer renderer)
@@ -600,7 +684,7 @@ namespace com.meronmks.ndmfsps
             }
         }
 
-        private static float[] GetMask(Renderer renderer, Plug plug)
+        internal static float[] GetMask(Renderer renderer, Plug plug)
         {
             var mesh = GetMesh(renderer);
             if (mesh == null) return null;
