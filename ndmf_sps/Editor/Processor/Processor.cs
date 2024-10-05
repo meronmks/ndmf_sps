@@ -224,8 +224,8 @@ namespace com.meronmks.ndmfsps
             receiver.shapeType = ContactBase.ShapeType.Sphere;
             receiver.radius = radius;
             receiver.position = pos;
-            receiver.allowSelf = party == ReceiverParty.Others;
-            receiver.allowOthers = party == ReceiverParty.Self;
+            receiver.allowSelf = party == ReceiverParty.Self;
+            receiver.allowOthers = party == ReceiverParty.Others;
             receiver.localOnly = localOnly;
             receiver.receiverType = receiverType;
             // この名前にあったアニメーションパラメータが必要
