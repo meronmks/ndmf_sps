@@ -9,6 +9,8 @@ namespace com.meronmks.ndmfsps
 {
     public class SPSforNDMFPlugin : Plugin<SPSforNDMFPlugin>
     {
+        public override string QualifiedName => "com.meronmks.ndmfsps";
+        public override string DisplayName => "NDMF SPS";
         public override Color? ThemeColor => new Color(0.213f, 0.520f, 0.742f);
         protected override void Configure()
         {
