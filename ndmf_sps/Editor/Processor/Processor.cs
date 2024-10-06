@@ -368,6 +368,19 @@ namespace com.meronmks.ndmfsps
             return mat.HasProperty("_TPSPenetratorEnabled") && mat.GetFloat("_TPSPenetratorEnabled") > 0;
         }
 
+        internal static bool IsSps(Material mat)
+        {
+            if (mat == null) return false;
+            return mat.HasProperty("_SPS_Bake");
+        }
+
+        internal static bool IsLocked(Material mat)
+        {
+            if (mat == null) return false;
+            if (mat.shader == null) return false;
+            return mat.shader.name.ToLower().Contains("locked");
+        }
+
         internal static Quaternion GetTpsRotation(Material mat)
         {
             if (mat.HasProperty("_TPS_PenetratorForward")) {
