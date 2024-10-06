@@ -436,8 +436,8 @@ namespace com.meronmks.ndmfsps
                         }
                         
                         var curveBinding = new EditorCurveBinding();
-
-                        curveBinding.path = objectToggleAction.obj.name; //TODO: SPSコンポーネントからのパスにした方がいいかも
+                        
+                        curveBinding.path = AnimationUtility.CalculateTransformPath(objectToggleAction.obj.transform, clipRoot.transform);
                         curveBinding.type = typeof(GameObject);
                         curveBinding.propertyName = "m_IsActive";
 
