@@ -80,9 +80,10 @@ namespace com.meronmks.ndmfsps
 
                 foreach (var renderer in size.renderers)
                 {
+                    SkinnedMeshRenderer skin = null;
                     try
                     {
-                        var skin = PlugProcessor.CreateNormalizeRenderer(renderer, bakedSpsPlug, size.worldLength);
+                        skin = PlugProcessor.CreateNormalizeRenderer(renderer, bakedSpsPlug, size.worldLength);
                         
                         var spsBlendshapes = plug.animatedBlendshapes
                             .Where(b => skin.sharedMesh.GetBlendShapeIndex(b) >= 0)
@@ -122,7 +123,40 @@ namespace com.meronmks.ndmfsps
                     {
                         NDMFConsole.LogError("ndmf.console.plug.failedToConfigureRenderer", e);
                     }
+                    
+                    if (skin == null) continue;
+                    var scaledProps = PlugProcessor.GetScaleProps(skin.sharedMaterials);
+                    if (scaledProps.Count == 0)
+                    {
+                        continue;
+                    }
+                    
+                    skin.sharedMaterials = skin.sharedMaterials.Select(mat => {
+                        var isTps = IsTps(mat);
+                        var isSps = IsSps(mat);
+
+                        if (!isTps && !isSps) return mat;
+
+                        mat = Object.Instantiate(mat);
+                        if (isTps) {
+                            if (IsLocked(mat))
+                            {
+                                throw new Exception();
+                            }
+                            mat.SetOverrideTag("_TPS_PenetratorLengthAnimated", "1");
+                            mat.SetOverrideTag("_TPS_PenetratorScaleAnimated", "1");
+                        }
+                        if (isSps) {
+                            mat.SetOverrideTag("_SPS_LengthAnimated", "1");
+                        }
+                        return mat;
+                    }).ToArray();
+                    
+                    var props = scaledProps.Select(p => (skin.gameObject, skin.GetType(), $"material.{p.Key}", p.Value));
+
+                    PlugProcessor.CreateScaleDetector(ctx, bakedSpsPlug, plug, props);
                 }
+                
             }
         }
 
@@ -228,8 +262,14 @@ namespace com.meronmks.ndmfsps
             receiver.allowOthers = party == ReceiverParty.Others;
             receiver.localOnly = localOnly;
             receiver.receiverType = receiverType;
-            // この名前にあったアニメーションパラメータが必要
             receiver.parameter = parameter;
+            
+            var maMergeAnimator = target.AddComponent<ModularAvatarMergeAnimator>();
+            var controller = new AnimatorController();
+            controller.AddParameter(parameter, AnimatorControllerParameterType.Float);
+            maMergeAnimator.animator = controller;
+            maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            maMergeAnimator.matchAvatarWriteDefaults = true;
             
             if (height > 0) {
                 receiver.shapeType = ContactBase.ShapeType.Capsule;

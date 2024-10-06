@@ -5,6 +5,7 @@ using System.Linq;
 using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
 using UnityEngine;
+using UnityEngine.Animations;
 using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
 using Object = UnityEngine.Object;
@@ -850,6 +851,135 @@ namespace com.meronmks.ndmfsps
             offTransition.duration = 0f;
             onTransition.offset = 0f;
             offTransition.offset = 0f;
+
+            maMergeAnimator.animator = controller;
+            maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            maMergeAnimator.matchAvatarWriteDefaults = true;
+        }
+
+        internal static Dictionary<string, float> GetScaleProps(IEnumerable<Material> materials)
+        {
+            var scaledProps = new Dictionary<string, float>();
+            foreach (var mat in materials) {
+                void Add(string propName, float val) {
+                    if (scaledProps.TryGetValue(propName, out var oldVal) && val != oldVal) {
+                        throw new Exception();
+                    }
+                    scaledProps[propName] = val;
+                }
+                void AddVector(string propName) {
+                    if (!mat.HasProperty(propName)) return;
+                    var val = mat.GetVector(propName);
+                    Add(propName + ".x", val.x);
+                    Add(propName + ".y", val.y);
+                    Add(propName + ".z", val.z);
+                }
+                void AddFloat(string propName) {
+                    if (!mat.HasProperty(propName)) return;
+                    var val = mat.GetFloat(propName);
+                    Add(propName, val);
+                }
+                
+                if (Processor.IsTps(mat)) {
+                    AddFloat("_TPS_PenetratorLength");
+                    AddVector("_TPS_PenetratorScale");
+                } else if (Processor.IsSps(mat)) {
+                    AddFloat("_SPS_Length");
+                }
+            }
+            return scaledProps;
+        }
+        
+        internal static void CreateScaleDetector(BuildContext ctx, GameObject root, Plug plug, IEnumerable<(GameObject gameObject, Type ComponentType, string PropertyName, float InitialValue)> properties)
+        {
+            var objectName = plug.gameObject.name.Replace("/", "_");
+            var scaleDetector = Processor.CreateParentGameObject("ScaleDetector", root.transform);
+            var sender = Processor.CreateParentGameObject("Sender", scaleDetector.transform);
+            var receiver = Processor.CreateParentGameObject("Receiver", scaleDetector.transform);
+            var scaleConstraint = receiver.AddComponent<ScaleConstraint>();
+            var tag = $"ScaleDetector_{objectName}";
+            
+            Processor.CreateVRCContactSender(
+                sender,
+                0.001f,
+                Vector3.zero,
+                Quaternion.identity,
+                new []
+                {
+                    tag
+                },
+                null);
+            
+            Processor.CreateVRCContactReceiver(
+                receiver,
+                0.1f,
+                new Vector3(0.1f, 0f, 0f),
+                new [] {tag},
+                $"{tag}_parameter", // 仮置き
+                null,
+                Processor.ReceiverParty.Self);
+
+            scaleConstraint.AddSource(new ConstraintSource()
+            {
+                sourceTransform = AssetDatabase.LoadAssetAtPath<Transform>(
+                    AssetDatabase.GUIDToAssetPath("45a1b1fa50df6a14cbf924c8d2aa80ed")),
+                weight = 1
+            });
+            scaleConstraint.weight = 1;
+            scaleConstraint.constraintActive = true;
+            scaleConstraint.locked = true;
+            
+            var maMergeAnimator = scaleDetector.AddComponent<ModularAvatarMergeAnimator>();
+            var controller = new AnimatorController();
+            var zeroClip = new AnimationClip();
+            var scaleClip = new AnimationClip();
+            
+            zeroClip.name = "scaleComp_zero";
+            scaleClip.name = "scaleComp_one";
+            controller.AddParameter($"{tag}_parameter", AnimatorControllerParameterType.Float);
+            controller.AddLayer($"Scale Detector for {objectName}");
+            
+            var layer = controller.layers[0];
+            var stateMachine = layer.stateMachine;
+
+            var scaleCompZero = stateMachine.AddState("scaleComp_zero");
+            var scaleCompOne = stateMachine.AddState("scaleComp_one");
+
+            scaleCompZero.motion = zeroClip;
+            scaleCompOne.motion = scaleClip;
+            
+            var onTransition = scaleCompZero.AddTransition(scaleCompOne);
+            var offTransition = scaleCompOne.AddTransition(scaleCompZero);
+            
+            onTransition.AddCondition(AnimatorConditionMode.Greater, 0.01f, $"{tag}_parameter");
+            offTransition.AddCondition(AnimatorConditionMode.Less, 0.01f, $"{tag}_parameter");
+            onTransition.hasFixedDuration = true;
+            offTransition.hasFixedDuration = true;
+            onTransition.duration = 0f;
+            offTransition.duration = 0f;
+            onTransition.offset = 0f;
+            offTransition.offset = 0f;
+
+            foreach (var prop in properties)
+            {
+                //TODO: なんかおかしいっぽいので直す
+                var objectPath = AnimationUtility.CalculateTransformPath(prop.gameObject.transform, ctx.AvatarRootTransform);
+                var curveBinding = new EditorCurveBinding();
+
+                curveBinding.path = objectPath;
+                curveBinding.type = prop.ComponentType;
+                curveBinding.propertyName = prop.PropertyName;
+
+                var scaleCompZeroCurve = new AnimationCurve();
+                scaleCompZeroCurve.AddKey(0f, 0f);
+
+                AnimationUtility.SetEditorCurve(zeroClip, curveBinding, scaleCompZeroCurve);
+                
+                var scaleCompOneCurve = new AnimationCurve();
+                scaleCompOneCurve.AddKey(0f, prop.InitialValue);
+
+                AnimationUtility.SetEditorCurve(scaleClip, curveBinding, scaleCompOneCurve);
+            }
 
             maMergeAnimator.animator = controller;
             maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
