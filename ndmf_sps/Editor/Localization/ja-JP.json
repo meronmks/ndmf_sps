@@ -50,5 +50,6 @@
   "com.meronmks.ndmfsps.runtime.FxFloatAction.value": "値",
   "ndmf.console.plug.failedToConfigureRenderer": "Rendererの設定に失敗しました",
   "ndmf.console.plug.unknowRendererType": "不明なRendererの種類です",
-  "ndmf.console.plug.missingMesh": "Meshが見つかりません"
+  "ndmf.console.plug.missingMesh": "Meshが見つかりません",
+  "ndmf.console.contact.maximumlimit": "Contactコンポーネントの数が最大値(256)を超えてます"
 }

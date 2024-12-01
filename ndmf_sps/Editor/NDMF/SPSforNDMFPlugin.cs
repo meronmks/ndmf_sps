@@ -29,6 +29,10 @@ namespace com.meronmks.ndmfsps
             // シェーダーの差し替えとかはMAやTTTの後
             var transformingPostProcess = InPhase(BuildPhase.Transforming).AfterPlugin("nadena.dev.modular-avatar").AfterPlugin("net.rs64.tex-trans-tool");
             transformingPostProcess.Run("Remove Component", ctx => Processor.RemoveComponent(ctx));
+            
+            // バリデーション
+            var validation = InPhase(BuildPhase.Optimizing).AfterPlugin("com.anatawa12.avatar-optimizer");
+            validation.Run("Validation", ctx => Processor.Validation(ctx));
         }
     }
 }

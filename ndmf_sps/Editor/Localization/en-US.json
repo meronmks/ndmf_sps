@@ -50,5 +50,6 @@
   "com.meronmks.ndmfsps.runtime.FxFloatAction.value": "Value",
   "ndmf.console.plug.failedToConfigureRenderer": "Failed to configure renderer",
   "ndmf.console.plug.unknowRendererType": "Unknown renderer type",
-  "ndmf.console.plug.missingMesh": "Missing mesh"
+  "ndmf.console.plug.missingMesh": "Missing mesh",
+  "ndmf.console.contact.maximumlimit": "Maximum limit (256) of contact component"
 }

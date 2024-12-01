@@ -224,6 +224,15 @@ namespace com.meronmks.ndmfsps
             }
         }
 
+        internal static void Validation(BuildContext ctx)
+        {
+            var components = ctx.AvatarRootObject.GetComponentsInChildren<ContactBase>(true);
+            if (components.Length > 256)
+            {
+                NDMFConsole.LogWarning("ndmf.console.contact.maximumlimit");
+            }
+        }
+
         internal static GameObject CreateParentGameObject(string name, Transform root)
         {
             var parent = new GameObject(name);
