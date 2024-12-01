@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Design;
 using System.Linq;
 using nadena.dev.modular_avatar.core;
 using nadena.dev.ndmf;
@@ -263,6 +264,15 @@ namespace com.meronmks.ndmfsps
             bool worldScale = true,
             bool useHipAvoidance = true)
         {
+            if (party == ReceiverParty.Both)
+            {
+                var otherTarget = CreateParentGameObject("Others", target.transform);
+                CreateVRCContactReceiver(otherTarget, radius, pos, collisionTags, $"{parameter}/Others", animator, ReceiverParty.Others, localOnly, height, rot, receiverType, worldScale, useHipAvoidance);
+                var selfTarget = CreateParentGameObject("Self", target.transform);
+                CreateVRCContactReceiver(selfTarget, radius, pos, collisionTags, $"{parameter}/Self", animator, ReceiverParty.Self, localOnly, height, rot, receiverType, worldScale, useHipAvoidance);
+                return;
+            }
+            
             var receiver = target.AddComponent<VRCContactReceiver>();
             receiver.shapeType = ContactBase.ShapeType.Sphere;
             receiver.radius = radius;

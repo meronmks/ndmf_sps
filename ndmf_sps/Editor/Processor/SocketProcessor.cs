@@ -308,16 +308,14 @@ namespace com.meronmks.ndmfsps
                 cache[depthAction.enableSelf] = true;
                 var animationsRoot = Processor.CreateParentGameObject("Animations", root);
                 var outerGameObject = Processor.CreateParentGameObject("Outer", animationsRoot.transform);
-                var frontOthersGameObject = Processor.CreateParentGameObject("FrontOthers", outerGameObject.transform);
-                var frontSelfGameObject = Processor.CreateParentGameObject("FrontSelf", outerGameObject.transform);
-                var backOthersGameObject = Processor.CreateParentGameObject("BackOthers", outerGameObject.transform);
-                var backSelfGameObject = Processor.CreateParentGameObject("BackSelf", outerGameObject.transform);
-
+                var frontGameObject = Processor.CreateParentGameObject("Front", outerGameObject.transform);
+                var backGameObject = Processor.CreateParentGameObject("Back", outerGameObject.transform);
+                
                 var animParmPrefix = $"{root.gameObject.name.Replace("/", "_")}/Anim{(depthAction.enableSelf ? "" : "Others")}";
                 var outerRadius = Math.Max(0.01f, maxDist);
                 
                 Processor.CreateVRCContactReceiver(
-                    frontOthersGameObject,
+                    frontGameObject,
                     outerRadius,
                     Vector3.zero,
                     new []
@@ -329,31 +327,7 @@ namespace com.meronmks.ndmfsps
                     depthAction.enableSelf ? Processor.ReceiverParty.Both : Processor.ReceiverParty.Others,
                     useHipAvoidance: socket.useHipAvoidance);
                 Processor.CreateVRCContactReceiver(
-                    frontSelfGameObject,
-                    outerRadius,
-                    Vector3.zero,
-                    new []
-                    {
-                        "TPS_Pen_Penetrating"
-                    },
-                    $"{animParmPrefix}/Outer/Front",
-                    animator,
-                    depthAction.enableSelf ? Processor.ReceiverParty.Both : Processor.ReceiverParty.Others,
-                    useHipAvoidance: socket.useHipAvoidance);
-                Processor.CreateVRCContactReceiver(
-                    backOthersGameObject,
-                    outerRadius,
-                    Vector3.zero + Vector3.forward * -0.01f,
-                    new []
-                    {
-                        "TPS_Pen_Penetrating"
-                    },
-                    $"{animParmPrefix}/Outer/Back",
-                    animator,
-                    depthAction.enableSelf ? Processor.ReceiverParty.Both : Processor.ReceiverParty.Others,
-                    useHipAvoidance: socket.useHipAvoidance);
-                Processor.CreateVRCContactReceiver(
-                    backSelfGameObject,
+                    backGameObject,
                     outerRadius,
                     Vector3.zero + Vector3.forward * -0.01f,
                     new []
@@ -367,15 +341,13 @@ namespace com.meronmks.ndmfsps
                 if (minDist < 0)
                 {
                     var innerGameObject = Processor.CreateParentGameObject("Inner", animationsRoot.transform);
-                    var frontOthersInnerGameObject = Processor.CreateParentGameObject("FrontOthers", innerGameObject.transform);
-                    var frontSelfInnerGameObject = Processor.CreateParentGameObject("FrontSelf", innerGameObject.transform);
-                    var backOthersInnerGameObject = Processor.CreateParentGameObject("BackOthers", innerGameObject.transform);
-                    var backSelfInnerGameObject = Processor.CreateParentGameObject("BackSelf", innerGameObject.transform);
-
+                    var frontInnerGameObject = Processor.CreateParentGameObject("Front", innerGameObject.transform);
+                    var backInnerGameObject = Processor.CreateParentGameObject("Back", innerGameObject.transform);
+                    
                     var posOffset = Vector3.forward * minDist;
                     
                     Processor.CreateVRCContactReceiver(
-                        frontOthersInnerGameObject,
+                        frontInnerGameObject,
                         -minDist,
                         posOffset,
                         new []
@@ -387,31 +359,7 @@ namespace com.meronmks.ndmfsps
                         depthAction.enableSelf ? Processor.ReceiverParty.Both : Processor.ReceiverParty.Others,
                         useHipAvoidance: socket.useHipAvoidance);
                     Processor.CreateVRCContactReceiver(
-                        frontSelfInnerGameObject,
-                        -minDist,
-                        posOffset,
-                        new []
-                        {
-                            "TPS_Pen_Penetrating"
-                        },
-                        $"{animParmPrefix}/Inner/Front",
-                        animator,
-                        depthAction.enableSelf ? Processor.ReceiverParty.Both : Processor.ReceiverParty.Others,
-                        useHipAvoidance: socket.useHipAvoidance);
-                    Processor.CreateVRCContactReceiver(
-                        backOthersInnerGameObject,
-                        -minDist,
-                        posOffset + Vector3.forward * -0.01f,
-                        new []
-                        {
-                            "TPS_Pen_Penetrating"
-                        },
-                        $"{animParmPrefix}/Inner/Back",
-                        animator,
-                        depthAction.enableSelf ? Processor.ReceiverParty.Both : Processor.ReceiverParty.Others,
-                        useHipAvoidance: socket.useHipAvoidance);
-                    Processor.CreateVRCContactReceiver(
-                        backSelfInnerGameObject,
+                        backInnerGameObject,
                         -minDist,
                         posOffset + Vector3.forward * -0.01f,
                         new []
