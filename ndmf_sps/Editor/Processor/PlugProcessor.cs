@@ -898,24 +898,23 @@ namespace com.meronmks.ndmfsps
             var receiver = Processor.CreateParentGameObject("Receiver", scaleDetector.transform);
             var scaleConstraint = receiver.AddComponent<ScaleConstraint>();
             var tag = $"ScaleDetector_{objectName}";
-            
+            var rcvParam = $"SFFix {objectName} - Rcv";
+            var finalParam = $"SFFin_{objectName}";
+            var oneParam = $"SFOne_{objectName}";
+
             Processor.CreateVRCContactSender(
                 sender,
                 0.001f,
                 Vector3.zero,
                 Quaternion.identity,
-                new []
-                {
-                    tag
-                },
+                new [] { tag },
                 null);
-            
             Processor.CreateVRCContactReceiver(
                 receiver,
                 0.1f,
                 new Vector3(0.1f, 0f, 0f),
-                new [] {tag},
-                $"{tag}_parameter", // 仮置き
+                new [] { tag },
+                rcvParam,
                 null,
                 Processor.ReceiverParty.Self);
 
@@ -928,62 +927,182 @@ namespace com.meronmks.ndmfsps
             scaleConstraint.weight = 1;
             scaleConstraint.constraintActive = true;
             scaleConstraint.locked = true;
-            
-            var maMergeAnimator = scaleDetector.AddComponent<ModularAvatarMergeAnimator>();
+
+            // --- スケール補正用アニメーター構築 ---
+            var maMergeAnimator = ctx.AvatarRootObject.AddComponent<ModularAvatarMergeAnimator>();
+
             var controller = new AnimatorController();
-            var zeroClip = new AnimationClip();
-            var scaleClip = new AnimationClip();
-            
-            zeroClip.name = "scaleComp_zero";
-            scaleClip.name = "scaleComp_one";
-            controller.AddParameter($"{tag}_parameter", AnimatorControllerParameterType.Float);
             controller.AddLayer($"Scale Detector for {objectName}");
+            controller.AddParameter(rcvParam, AnimatorControllerParameterType.Float);
+            controller.AddParameter(finalParam, AnimatorControllerParameterType.Float);
+            controller.AddParameter(new AnimatorControllerParameter
+            {
+                name = oneParam,
+                type = AnimatorControllerParameterType.Float,
+                defaultFloat = 1f
+            });
             
             var layer = controller.layers[0];
             var stateMachine = layer.stateMachine;
 
-            var scaleCompZero = stateMachine.AddState("scaleComp_zero");
-            var scaleCompOne = stateMachine.AddState("scaleComp_one");
-
-            scaleCompZero.motion = zeroClip;
-            scaleCompOne.motion = scaleClip;
-            
-            var onTransition = scaleCompZero.AddTransition(scaleCompOne);
-            var offTransition = scaleCompOne.AddTransition(scaleCompZero);
-            
-            onTransition.AddCondition(AnimatorConditionMode.Greater, 0.01f, $"{tag}_parameter");
-            offTransition.AddCondition(AnimatorConditionMode.Less, 0.01f, $"{tag}_parameter");
-            onTransition.hasFixedDuration = true;
-            offTransition.hasFixedDuration = true;
-            onTransition.duration = 0f;
-            offTransition.duration = 0f;
-            onTransition.offset = 0f;
-            offTransition.offset = 0f;
-
+            var receiveClip = new AnimationClip { name = $"SC_{objectName}_receive" };
+            var finalClip = new AnimationClip { name = $"SC_{objectName}_final" };
+            var zeroClip = new AnimationClip { name = $"SC_{objectName}_zero" };
             foreach (var prop in properties)
             {
-                //TODO: なんかおかしいっぽいので直す
-                var objectPath = AnimationUtility.CalculateTransformPath(prop.gameObject.transform, ctx.AvatarRootTransform);
-                var curveBinding = new EditorCurveBinding();
+                var renderer = prop.gameObject.GetComponent<Renderer>();
+                var rendererType = renderer != null ? renderer.GetType() : prop.ComponentType;
+                var p = GetRelativePath(prop.gameObject, ctx.AvatarRootObject);
+                var receiveCurve = new AnimationCurve();
+                receiveCurve.AddKey(0f, 100f);
+                AnimationUtility.SetEditorCurve(receiveClip, new EditorCurveBinding {
+                    path = "",
+                    type = typeof(Animator),
+                    propertyName = finalParam
+                }, receiveCurve);
 
-                curveBinding.path = objectPath;
-                curveBinding.type = prop.ComponentType;
-                curveBinding.propertyName = prop.PropertyName;
-
-                var scaleCompZeroCurve = new AnimationCurve();
-                scaleCompZeroCurve.AddKey(0f, 0f);
-
-                AnimationUtility.SetEditorCurve(zeroClip, curveBinding, scaleCompZeroCurve);
+                var finalCurve = new AnimationCurve();
                 
-                var scaleCompOneCurve = new AnimationCurve();
-                scaleCompOneCurve.AddKey(0f, prop.InitialValue);
-
-                AnimationUtility.SetEditorCurve(scaleClip, curveBinding, scaleCompOneCurve);
+                finalCurve.AddKey(0f, prop.InitialValue);
+                AnimationUtility.SetEditorCurve(finalClip, new EditorCurveBinding {
+                    path = p,
+                    type = rendererType,
+                    propertyName = prop.PropertyName
+                }, finalCurve);
+                
+                var zeroCurve = new AnimationCurve();
+                
+                zeroCurve.AddKey(0f, 0f);
+                AnimationUtility.SetEditorCurve(zeroClip, new EditorCurveBinding {
+                    path = p,
+                    type = rendererType,
+                    propertyName = prop.PropertyName
+                }, zeroCurve);
             }
+
+            // DBT（childはzeroClip, oneClipの2つ）
+            var dbt = new BlendTree
+            {
+                name = $"{objectName}_ScaleCompDBT",
+                blendType = BlendTreeType.Direct,
+                useAutomaticThresholds = false
+            };
+            dbt.children = new ChildMotion[] {
+                new ChildMotion { motion = receiveClip, directBlendParameter = rcvParam, timeScale = 1f },
+                new ChildMotion { motion = zeroClip, directBlendParameter = oneParam, timeScale = 1f },
+                new ChildMotion { motion = finalClip, directBlendParameter = finalParam, timeScale = 1f }
+            };
+            // ステート
+            var state = stateMachine.AddState("ScaleComp");
+            state.motion = dbt;
+            stateMachine.defaultState = state;
 
             maMergeAnimator.animator = controller;
             maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
             maMergeAnimator.matchAvatarWriteDefaults = true;
+        }
+        
+        private static string GetRelativePath(GameObject targetObject, GameObject rootObject = null)
+        {
+            if (targetObject == null) return "";
+            
+            // ルートオブジェクトが指定されていない場合は通常の絶対パスを返す
+            if (rootObject == null)
+            {
+                return GetAbsolutePath(targetObject);
+            }
+            
+            // GUID比較でルートオブジェクトまでの探索を行う
+            string targetGuid = GetGameObjectGUID(targetObject);
+            string rootGuid = GetGameObjectGUID(rootObject);
+            
+            if (string.IsNullOrEmpty(targetGuid) || string.IsNullOrEmpty(rootGuid))
+            {
+                // GUID取得に失敗した場合はオブジェクト参照で比較
+                return GetRelativePathByReference(targetObject, rootObject);
+            }
+            
+            // 対象オブジェクトから親を辿ってルートを探す
+            string path = targetObject.name;
+            Transform current = targetObject.transform.parent;
+            
+            while (current != null)
+            {
+                string currentGuid = GetGameObjectGUID(current.gameObject);
+                
+                // GUID比較でルートオブジェクトに到達したかチェック
+                if (currentGuid == rootGuid)
+                {
+                    return path; // ルートまでの相対パスを返す
+                }
+                
+                path = current.name + "/" + path;
+                current = current.parent;
+            }
+            
+            // ルートオブジェクトが見つからなかった場合はシーンルートからの絶対パスを返す
+            Debug.LogWarning($"指定されたルートオブジェクト '{rootObject.name}' が対象オブジェクト '{targetObject.name}' の親階層に見つかりませんでした。絶対パスを返します。");
+            return GetAbsolutePath(targetObject);
+        }
+        
+        private static string GetRelativePathByReference(GameObject targetObject, GameObject rootObject)
+        {
+            string path = targetObject.name;
+            Transform current = targetObject.transform.parent;
+            
+            while (current != null)
+            {
+                if (current.gameObject == rootObject)
+                {
+                    return path;
+                }
+                
+                path = current.name + "/" + path;
+                current = current.parent;
+            }
+            
+            Debug.LogWarning($"指定されたルートオブジェクト '{rootObject.name}' が対象オブジェクト '{targetObject.name}' の親階層に見つかりませんでした。絶対パスを返します。");
+            return GetAbsolutePath(targetObject);
+        }
+        
+        private static string GetAbsolutePath(GameObject gameObject)
+        {
+            if (gameObject == null) return "";
+            
+            string path = gameObject.name;
+            Transform current = gameObject.transform.parent;
+            
+            while (current != null)
+            {
+                path = current.name + "/" + path;
+                current = current.parent;
+            }
+            
+            return path;
+        }
+        
+        private static string GetGameObjectGUID(GameObject gameObject)
+        {
+            if (gameObject == null) return "";
+            
+#if UNITY_EDITOR
+            if (PrefabUtility.IsPartOfAnyPrefab(gameObject))
+            {
+                GameObject prefabRoot = PrefabUtility.GetOutermostPrefabInstanceRoot(gameObject);
+                if (prefabRoot != null)
+                {
+                    string prefabPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefabRoot);
+                    if (!string.IsNullOrEmpty(prefabPath))
+                    {
+                        return AssetDatabase.AssetPathToGUID(prefabPath);
+                    }
+                }
+            }
+            
+            return gameObject.GetInstanceID().ToString();
+#else
+            return gameObject.GetInstanceID().ToString();
+#endif
         }
     }
 }
