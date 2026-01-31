@@ -230,7 +230,7 @@ namespace com.meronmks.ndmfsps
             var components = ctx.AvatarRootObject.GetComponentsInChildren<ContactBase>(true);
             if (components.Length > 256)
             {
-                NDMFConsole.LogWarning("ndmf.console.contact.maximumlimit");
+                NDMFConsole.LogWarning("ndmf.console.contact.maximumlimit",components.Length);
             }
         }
 

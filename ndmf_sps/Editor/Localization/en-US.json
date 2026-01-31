@@ -51,5 +51,5 @@
   "ndmf.console.plug.failedToConfigureRenderer": "Failed to configure renderer",
   "ndmf.console.plug.unknowRendererType": "Unknown renderer type",
   "ndmf.console.plug.missingMesh": "Missing mesh",
-  "ndmf.console.contact.maximumlimit": "Maximum limit (256) of contact component"
+  "ndmf.console.contact.maximumlimit": "The number of Contact components exceeds the maximum value (256). Current value: {0}\nPlease consider reducing the number of Plugs or Sockets."
 }
