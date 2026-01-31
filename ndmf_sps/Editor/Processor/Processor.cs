@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing.Design;
 using System.Linq;
@@ -97,11 +97,16 @@ namespace com.meronmks.ndmfsps
                         //TODO: ここでAutoRig設定？
                         
                         var spsBaked = PlugProcessor.BakeTexture2D(skin, activeFromMask, spsBlendshapes);
-                        
-                        foreach (var material in skin.materials)
+
+                        var materials = skin.sharedMaterials;
+                        for (var j = 0; j < materials.Length; j++)
                         {
-                            var (newShader, _) = ShaderPatcher.Patch(material.shader);
-                            
+                            var sourceMaterial = materials[j];
+                            var (newShader, _) = ShaderPatcher.Patch(sourceMaterial.shader);
+
+                            var material = new Material(sourceMaterial.shader);
+                            material.name = sourceMaterial.name;
+                            material.CopyPropertiesFromMaterial(sourceMaterial);
                             material.shader = newShader;
                             material.SetFloat("_SPS_Enabled", plug.animatedToggle ? 1f : 0f);
                             bakedSpsPlug.SetActive(plug.animatedToggle);
@@ -118,7 +123,10 @@ namespace com.meronmks.ndmfsps
                                     material.SetFloat("_SPS_Blendshape" + i, skin.GetBlendShapeWeight(id));
                                 }
                             }
+                            ObjectRegistry.RegisterReplacedObject(sourceMaterial, material);
+                            materials[j] = material;
                         }
+                        skin.sharedMaterials = materials;
                     }
                     catch (Exception e)
                     {
