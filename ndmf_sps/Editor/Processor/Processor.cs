@@ -222,6 +222,14 @@ namespace com.meronmks.ndmfsps
                 maManuItem.Control.value = 1f;
                 maManuItem.Control.parameter = new VRCExpressionsMenu.Control.Parameter();
                 maManuItem.Control.parameter.name = $"{objectName}/Socket/Active";
+                var maParameters = socketMenuObject.AddComponent<ModularAvatarParameters>();
+                var parms = new List<ParameterConfig>();
+                var parm = new ParameterConfig();
+                parm.defaultValue = 1f;
+                parm.nameOrPrefix = $"{objectName}/Socket/Active";
+                parm.syncType = ParameterSyncType.Bool;
+                parms.Add(parm);
+                maParameters.parameters = parms;
             }
         }
 
