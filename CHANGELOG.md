@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 ### Fixed
+- 自動生成されるSocketのMenuが壊れてて動作していなかった問題を修正
 
 ### Security
 
