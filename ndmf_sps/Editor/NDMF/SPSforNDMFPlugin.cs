@@ -11,7 +11,7 @@ namespace com.meronmks.ndmfsps
     {
         public override string QualifiedName => "com.meronmks.ndmfsps";
         public override string DisplayName => "NDMF SPS";
-        public override Color? ThemeColor => new Color(0.213f, 0.520f, 0.742f);
+        public override Color? ThemeColor => new Color(0.213f, 0.720f, 0.542f);
         protected override void Configure()
         {
             // いろいろ作る
