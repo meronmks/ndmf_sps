@@ -2,6 +2,7 @@
   "Language": "English (United States)",
 
   "inspector.common.commonInfoMes": "For SPS to work properly, set the Pixel Lights setting in VRChat to High.\nIn VRChat settings, set Settings > Graphics > Advanced > Pixel Lights to High.",
+  "inspector.common.plugWarnMes": "To use Plug, VRCFury is required. If it does not exist, it will be built at build time with an error.",
   "inspector.common.enableDeformation": "Enable deformation",
   "inspector.common.enableDepthAnimations": "Enable depth actions",
   "inspector.common.depthActions": "Actions",
