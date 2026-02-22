@@ -2,6 +2,7 @@
   "Language": "日本語 (日本)",
 
   "inspector.common.commonInfoMes": "SPSを正しく動作させるにはVRChatの [ピクセルライト数] 設定が [高] に設定してください。\nVRChat設定の [設定] > [グラフィックス] > [詳細設定] > [ピクセルライト数] を [高] に設定してください。",
+  "inspector.common.plugWarnMes": "Plugを利用するにはVRCFuryが必要です。存在しない場合ビルド時にエラーとなります。",
   "inspector.common.enableDeformation": "変形を有効にする",
   "inspector.common.enableDepthAnimations": "位置によるアクションを有効にする",
   "inspector.common.depthActions": "アクション一覧",

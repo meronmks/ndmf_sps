@@ -14,6 +14,7 @@ namespace com.meronmks.ndmfsps
             Plug plug = target as Plug;
             Localization.SelectLanguageGUI();
             CommonGUI.ShowCommonHelpBox();
+            EditorGUILayout.HelpBox(Localization.S("inspector.common.plugWarnMes"), MessageType.Warning);
             EditorGUILayout.Separator();
 
             var pAutomaticallyFindMesh = serializedObject.FindProperty(nameof(Plug.automaticallyFindMesh));
