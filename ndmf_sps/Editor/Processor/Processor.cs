@@ -201,9 +201,20 @@ namespace com.meronmks.ndmfsps
         internal static void CreateMenu(BuildContext ctx)
         {
             if (sockets.Length == 0) return;
-            var spsMenusObjectRoot = new GameObject("SPS");
-            spsMenusObjectRoot.transform.parent = ctx.AvatarRootTransform;
-            spsMenusObjectRoot.AddComponent<ModularAvatarMenuInstaller>();
+            var menuTarget = ctx.AvatarRootObject.GetComponentInChildren<SPSMenuTarget>(true);
+            GameObject spsMenusObjectRoot;
+
+            if (menuTarget == null)
+            {
+                spsMenusObjectRoot = new GameObject("SPS_Soket_Menu");
+                spsMenusObjectRoot.transform.parent = ctx.AvatarRootTransform;
+                spsMenusObjectRoot.AddComponent<ModularAvatarMenuInstaller>();
+            }
+            else
+            {
+                spsMenusObjectRoot = menuTarget.gameObject;
+            }
+            
             var maRootManuItem = spsMenusObjectRoot.AddComponent<ModularAvatarMenuItem>();
 
             maRootManuItem.Control = new VRCExpressionsMenu.Control();

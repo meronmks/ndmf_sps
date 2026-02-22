@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - NDMF ParameterProviderに対応
+- メニューの導入位置をカスタムする用のPrefabを追加
 
 ### Changed
 
