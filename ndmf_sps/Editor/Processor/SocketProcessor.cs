@@ -16,14 +16,14 @@ namespace com.meronmks.ndmfsps
     using runtime;
     using UnityEditor;
     using UnityEditor.Animations;
-    
+
     internal static class SocketProcessor
     {
         // SPSシェーダが対象のLightだと判定する色
         private static Color spsTypeColor = Color.black;
-        
+
         private const string SENDER_PARAMPREFIX = "OGB/Orf/";
-        
+
         /// <summary>
         /// TPSとSPSで使う何かへのSender
         /// </summary>
@@ -54,26 +54,26 @@ namespace com.meronmks.ndmfsps
                         break;
                 }
             }
-            
+
             Processor.CreateVRCContactSender(rootObject,
-                0.001f, 
-                Vector3.zero, 
-                Quaternion.identity, 
+                0.001f,
+                Vector3.zero,
+                Quaternion.identity,
                 rootTags.ToArray(),
                 animator);
-            
+
             Processor.CreateVRCContactSender(frontObject,
-                0.001f, 
-                Vector3.forward * 0.01f, 
-                Quaternion.identity, 
-                new []
+                0.001f,
+                Vector3.forward * 0.01f,
+                Quaternion.identity,
+                new[]
                 {
                     "TPS_Orf_Norm",
                     "SPSLL_Socket_Front"
                 },
                 animator);
         }
-        
+
         /// <summary>
         /// Plugの目標となるLightの生成
         /// </summary>
@@ -84,7 +84,8 @@ namespace com.meronmks.ndmfsps
             var lightRoot = Processor.CreateParentGameObject("Lights", root);
             var rootObject = Processor.CreateParentGameObject("Root", lightRoot.transform);
             var frontObject = Processor.CreateParentGameObject("Front", lightRoot.transform);
-            frontObject.gameObject.transform.SetLocalPositionAndRotation(Vector3.forward * 0.01f / lightRoot.transform.lossyScale.x, Quaternion.identity);
+            frontObject.gameObject.transform.SetLocalPositionAndRotation(
+                Vector3.forward * 0.01f / lightRoot.transform.lossyScale.x, Quaternion.identity);
 
             var lightRootComponent = rootObject.AddComponent<Light>();
             var lightFrontComponent = frontObject.AddComponent<Light>();
@@ -104,6 +105,7 @@ namespace com.meronmks.ndmfsps
                     lightRootComponent.range = 0.4202f;
                     break;
             }
+
             lightFrontComponent.range = 0.4502f;
 
             lightRootComponent.color = spsTypeColor;
@@ -133,8 +135,9 @@ namespace com.meronmks.ndmfsps
                 var touchOthersClose = Processor.CreateParentGameObject("TouchOthersClose", hapticsRoot.transform);
                 var penOthers = Processor.CreateParentGameObject("PenOthers", hapticsRoot.transform);
                 var penOthersClose = Processor.CreateParentGameObject("PenOthersClose", hapticsRoot.transform);
-                var frotOthers = Processor.CreateParentGameObject("FrotOthers", hapticsRoot.transform); //Typoっぽいが元がこうなので一旦これで
-                
+                var frotOthers =
+                    Processor.CreateParentGameObject("FrotOthers", hapticsRoot.transform); //Typoっぽいが元がこうなので一旦これで
+
                 Processor.CreateVRCContactReceiver(
                     touchSelf,
                     handTouchZone.length,
@@ -145,11 +148,11 @@ namespace com.meronmks.ndmfsps
                     Processor.ReceiverParty.Self,
                     localOnly: true,
                     useHipAvoidance: socket.useHipAvoidance);
-                
+
                 Processor.CreateVRCContactReceiver(
                     touchSelfClose,
                     handTouchZone.radius,
-                    Vector3.forward * -(handTouchZone.length/2),
+                    Vector3.forward * -(handTouchZone.length / 2),
                     Processor.selfContacts,
                     $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchSelfClose.name.Replace("/", "_")}",
                     animator,
@@ -157,9 +160,9 @@ namespace com.meronmks.ndmfsps
                     receiverType: ContactReceiver.ReceiverType.Constant,
                     height: handTouchZone.length,
                     localOnly: true,
-                    rot: Quaternion.Euler(90,0,0),
+                    rot: Quaternion.Euler(90, 0, 0),
                     useHipAvoidance: socket.useHipAvoidance);
-                
+
                 Processor.CreateVRCContactReceiver(
                     touchOthers,
                     handTouchZone.length,
@@ -170,11 +173,11 @@ namespace com.meronmks.ndmfsps
                     Processor.ReceiverParty.Others,
                     localOnly: true,
                     useHipAvoidance: socket.useHipAvoidance);
-                
+
                 Processor.CreateVRCContactReceiver(
                     touchOthersClose,
                     handTouchZone.radius,
-                    Vector3.forward * -(handTouchZone.length/2),
+                    Vector3.forward * -(handTouchZone.length / 2),
                     Processor.bodyContacts,
                     $"{SENDER_PARAMPREFIX}{root.gameObject.name.Replace("/", "_")}/{touchOthersClose.name.Replace("/", "_")}",
                     animator,
@@ -182,14 +185,14 @@ namespace com.meronmks.ndmfsps
                     receiverType: ContactReceiver.ReceiverType.Constant,
                     localOnly: true,
                     height: handTouchZone.length,
-                    rot: Quaternion.Euler(90,0,0),
+                    rot: Quaternion.Euler(90, 0, 0),
                     useHipAvoidance: socket.useHipAvoidance);
-                
+
                 Processor.CreateVRCContactReceiver(
                     penOthers,
                     handTouchZone.length,
                     Vector3.forward * -handTouchZone.length,
-                    new []
+                    new[]
                     {
                         "TPS_Pen_Penetrating"
                     },
@@ -198,12 +201,12 @@ namespace com.meronmks.ndmfsps
                     Processor.ReceiverParty.Others,
                     localOnly: true,
                     useHipAvoidance: socket.useHipAvoidance);
-                
+
                 Processor.CreateVRCContactReceiver(
                     penOthersClose,
                     handTouchZone.radius,
-                    Vector3.forward * -(handTouchZone.length/2),
-                    new []
+                    Vector3.forward * -(handTouchZone.length / 2),
+                    new[]
                     {
                         "TPS_Pen_Penetrating"
                     },
@@ -213,14 +216,14 @@ namespace com.meronmks.ndmfsps
                     receiverType: ContactReceiver.ReceiverType.Constant,
                     localOnly: true,
                     height: handTouchZone.length,
-                    rot: Quaternion.Euler(90,0,0),
+                    rot: Quaternion.Euler(90, 0, 0),
                     useHipAvoidance: socket.useHipAvoidance);
-                
+
                 Processor.CreateVRCContactReceiver(
                     frotOthers,
                     0.1f,
                     Vector3.forward * 0.05f,
-                    new []
+                    new[]
                     {
                         "TPS_Orf_Root"
                     },
@@ -230,12 +233,12 @@ namespace com.meronmks.ndmfsps
                     localOnly: true,
                     useHipAvoidance: socket.useHipAvoidance);
             }
-            
+
             Processor.CreateVRCContactReceiver(
                 penSelfNewRoot,
                 1f,
                 Vector3.zero,
-                new []
+                new[]
                 {
                     "TPS_Pen_Root"
                 },
@@ -244,12 +247,12 @@ namespace com.meronmks.ndmfsps
                 Processor.ReceiverParty.Self,
                 localOnly: true,
                 useHipAvoidance: socket.useHipAvoidance);
-            
+
             Processor.CreateVRCContactReceiver(
                 penSelfNewTip,
                 1f,
                 Vector3.zero,
-                new []
+                new[]
                 {
                     "TPS_Pen_Penetrating"
                 },
@@ -258,12 +261,12 @@ namespace com.meronmks.ndmfsps
                 Processor.ReceiverParty.Self,
                 localOnly: true,
                 useHipAvoidance: socket.useHipAvoidance);
-            
+
             Processor.CreateVRCContactReceiver(
                 penOthersNewRoot,
                 1f,
                 Vector3.zero,
-                new []
+                new[]
                 {
                     "TPS_Pen_Root"
                 },
@@ -272,12 +275,12 @@ namespace com.meronmks.ndmfsps
                 Processor.ReceiverParty.Others,
                 localOnly: true,
                 useHipAvoidance: socket.useHipAvoidance);
-            
+
             Processor.CreateVRCContactReceiver(
                 penOthersNewTip,
                 1f,
                 Vector3.zero,
-                new []
+                new[]
                 {
                     "TPS_Pen_Penetrating"
                 },
@@ -287,7 +290,7 @@ namespace com.meronmks.ndmfsps
                 localOnly: true,
                 useHipAvoidance: socket.useHipAvoidance);
         }
-        
+
         /// <summary>
         /// Plugの位置によって動くContact
         /// </summary>
@@ -295,30 +298,34 @@ namespace com.meronmks.ndmfsps
         internal static void CreateVRCContacts(BuildContext ctx, Transform root, Socket socket)
         {
             var animator = ctx.AvatarRootObject.GetComponent<Animator>();
-            
+
             var maxDist = Math.Max(0, socket.depthActions.Max(a => Math.Max(a.startDistance, a.endDistance)));
             var minDist = Math.Min(0, socket.depthActions.Min(a => Math.Min(a.startDistance, a.endDistance)));
             // var offset = Math.Max(0, -minDist);
 
-            var cache = new Dictionary<bool, bool>();
+            // var cache = new Dictionary<bool, bool>();
+
+            int loopCount = 0;
 
             foreach (var depthAction in socket.depthActions)
             {
-                if(cache.ContainsKey(depthAction.enableSelf)) continue;
-                cache[depthAction.enableSelf] = true;
+                // if (cache.ContainsKey(depthAction.enableSelf)) continue;
+                bool hasInner = false;
+                // cache[depthAction.enableSelf] = true;
                 var animationsRoot = Processor.CreateParentGameObject("Animations", root);
                 var outerGameObject = Processor.CreateParentGameObject("Outer", animationsRoot.transform);
                 var frontGameObject = Processor.CreateParentGameObject("Front", outerGameObject.transform);
                 var backGameObject = Processor.CreateParentGameObject("Back", outerGameObject.transform);
-                
-                var animParmPrefix = $"{root.gameObject.name.Replace("/", "_")}/Anim{(depthAction.enableSelf ? "" : "Others")}";
+
+                var animParmPrefix =
+                    $"{root.gameObject.name.Replace("/", "_")}/Anim{(depthAction.enableSelf ? "" : "Others")}";
                 var outerRadius = Math.Max(0.01f, maxDist);
-                
+
                 Processor.CreateVRCContactReceiver(
                     frontGameObject,
                     outerRadius,
                     Vector3.zero,
-                    new []
+                    new[]
                     {
                         "TPS_Pen_Penetrating"
                     },
@@ -330,7 +337,7 @@ namespace com.meronmks.ndmfsps
                     backGameObject,
                     outerRadius,
                     Vector3.zero + Vector3.forward * -0.01f,
-                    new []
+                    new[]
                     {
                         "TPS_Pen_Penetrating"
                     },
@@ -340,17 +347,18 @@ namespace com.meronmks.ndmfsps
                     useHipAvoidance: socket.useHipAvoidance);
                 if (minDist < 0)
                 {
+                    hasInner = true;
                     var innerGameObject = Processor.CreateParentGameObject("Inner", animationsRoot.transform);
                     var frontInnerGameObject = Processor.CreateParentGameObject("Front", innerGameObject.transform);
                     var backInnerGameObject = Processor.CreateParentGameObject("Back", innerGameObject.transform);
-                    
+
                     var posOffset = Vector3.forward * minDist;
-                    
+
                     Processor.CreateVRCContactReceiver(
                         frontInnerGameObject,
                         -minDist,
                         posOffset,
-                        new []
+                        new[]
                         {
                             "TPS_Pen_Penetrating"
                         },
@@ -362,7 +370,7 @@ namespace com.meronmks.ndmfsps
                         backInnerGameObject,
                         -minDist,
                         posOffset + Vector3.forward * -0.01f,
-                        new []
+                        new[]
                         {
                             "TPS_Pen_Penetrating"
                         },
@@ -371,9 +379,12 @@ namespace com.meronmks.ndmfsps
                         depthAction.enableSelf ? Processor.ReceiverParty.Both : Processor.ReceiverParty.Others,
                         useHipAvoidance: socket.useHipAvoidance);
                 }
+                
+                CreateDepthMappingLayer(socket, animParmPrefix, outerRadius, hasInner ? -minDist : 0f, loopCount);
+                loopCount++;
             }
         }
-        
+
         /// <summary>
         /// Plugが接近したら自動でOnになる機能に使われてるっぽい
         /// </summary>
@@ -383,12 +394,12 @@ namespace com.meronmks.ndmfsps
             var animator = ctx.AvatarRootObject.GetComponent<Animator>();
             var autoDistanceRoot = Processor.CreateParentGameObject("AutoDistance", socket.transform);
             var receiverGameObject = Processor.CreateParentGameObject("Receiver", autoDistanceRoot.transform);
-            
+
             Processor.CreateVRCContactReceiver(
                 receiverGameObject,
                 0.3f,
                 Vector3.zero,
-                new []
+                new[]
                 {
                     "TPS_Pen_Penetrating"
                 },
@@ -406,7 +417,7 @@ namespace com.meronmks.ndmfsps
             var controller = new AnimatorController();
             var emptyClip = new AnimationClip();
             var parmName = $"{objectName}/Anim{count}/Mapped";
-            
+
             emptyClip.name = "Empty";
             controller.AddParameter(parmName, AnimatorControllerParameterType.Float);
             controller.AddLayer($"Depth Animation {count} for {objectName}");
@@ -417,9 +428,9 @@ namespace com.meronmks.ndmfsps
             var onState = stateMachine.AddState("On");
 
             offState.motion = emptyClip;
-            
+
             var animClipTuple = Processor.CreateAnimationClip(ctx, socket.gameObject, depthAction.actions, onState);
-            
+
             var blendTree = new BlendTree();
             blendTree.name = $"{objectName}Tree {count}";
             blendTree.blendType = BlendTreeType.Simple1D;
@@ -427,12 +438,12 @@ namespace com.meronmks.ndmfsps
             blendTree.useAutomaticThresholds = false;
             blendTree.AddChild(animClipTuple.Item2, 0f);
             blendTree.AddChild(animClipTuple.Item1, 1f);
-            
+
             onState.motion = blendTree;
 
             var onTransition = offState.AddTransition(onState);
             var offTransition = onState.AddTransition(offState);
-            
+
             onTransition.AddCondition(AnimatorConditionMode.Greater, 0.01f, parmName);
             offTransition.AddCondition(AnimatorConditionMode.Less, 0.01f, parmName);
             onTransition.hasFixedDuration = true;
@@ -453,20 +464,21 @@ namespace com.meronmks.ndmfsps
             {
                 actions = new List<IAction>();
             }
+
             var objectName = socket.gameObject.name.Replace("/", "_");
             var maMergeAnimator = socket.gameObject.AddComponent<ModularAvatarMergeAnimator>();
             var controller = new AnimatorController();
             var parmName = $"{objectName}/Socket/Active"; //TODO: パラメータ名は一旦仮置き
-            
+
             controller.AddParameter(parmName, AnimatorControllerParameterType.Bool);
             controller.AddLayer($"SPS - Socket - Active Animation for {objectName}");
-            
+
             var layer = controller.layers[0];
             var stateMachine = layer.stateMachine;
 
             var offState = stateMachine.AddState("Off");
             var onState = stateMachine.AddState("On");
-            
+
             foreach (Transform child in socket.transform)
             {
                 child.gameObject.SetActive(false);
@@ -482,15 +494,15 @@ namespace com.meronmks.ndmfsps
                     });
                 }
             }
-            
+
             var animClipTuple = Processor.CreateAnimationClip(ctx, socket.gameObject, actions, onState);
 
             onState.motion = animClipTuple.Item1;
             offState.motion = animClipTuple.Item2;
-            
+
             var onTransition = offState.AddTransition(onState);
             var offTransition = onState.AddTransition(offState);
-            
+
             onTransition.AddCondition(AnimatorConditionMode.If, 0f, parmName);
             offTransition.AddCondition(AnimatorConditionMode.IfNot, 0f, parmName);
             onTransition.hasFixedDuration = true;
@@ -503,6 +515,93 @@ namespace com.meronmks.ndmfsps
             maMergeAnimator.animator = controller;
             maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
             maMergeAnimator.matchAvatarWriteDefaults = true;
+        }
+
+        private static void CreateDepthMappingLayer(Socket socket,
+            string animParmPrefix, float outerRadius, float innerRadius, int count)
+        {
+            var objectName = socket.gameObject.name.Replace("/", "_");
+            var maMergeAnimator = socket.gameObject.AddComponent<ModularAvatarMergeAnimator>();
+            var controller = new AnimatorController();
+            
+            var outerFrontParam = $"{animParmPrefix}/Outer/Front";
+            var outerBackParam = $"{animParmPrefix}/Outer/Back";
+            var mappedParam = $"{animParmPrefix}/Mapped";
+
+            controller.AddParameter(outerFrontParam, AnimatorControllerParameterType.Float);
+            controller.AddParameter(outerBackParam, AnimatorControllerParameterType.Float);
+            controller.AddParameter(mappedParam, AnimatorControllerParameterType.Float);
+
+            bool hasInner = innerRadius > 0;
+            string innerFrontParam = $"{animParmPrefix}/Inner/Front";
+            string innerBackParam = $"{animParmPrefix}/Inner/Back";
+            if (hasInner)
+            {
+                controller.AddParameter(innerFrontParam, AnimatorControllerParameterType.Float);
+                controller.AddParameter(innerBackParam, AnimatorControllerParameterType.Float);
+            }
+
+            // --- レイヤー1: outerDepth = Outer/Front - Outer/Back を AAP に書く ---
+            // Direct BlendTree で実現:
+            //   子1: motionTime=OuterFront, clip が mappedParam を +outerRadius に
+            //   子2: motionTime=OuterBack,  clip が mappedParam を -outerRadius に
+            // (VRCFury 方式)
+
+            controller.AddLayer($"SPS Depth Mapping {count} for {objectName}");
+            var layer = controller.layers[controller.layers.Length - 1];
+            layer.defaultWeight = 1f;
+
+            var stateMachine = layer.stateMachine;
+            var calcState = stateMachine.AddState("CalcDepth");
+            calcState.writeDefaultValues = true;
+
+            // Direct BlendTree でサブトラクションを実装
+            var directTree = new BlendTree();
+            directTree.blendType = BlendTreeType.Direct;
+            directTree.name = $"DepthCalc_{objectName}_{count}";
+
+            // Outer/Front の寄与: +1 方向に outerRadius 分
+            var outerFrontClip = CreateAAPClip($"outerFront_{count}", mappedParam, outerRadius);
+            directTree.AddChild(outerFrontClip);
+
+            // Outer/Back の寄与: -1 方向に outerRadius 分 (反転)
+            var outerBackClip = CreateAAPClip($"outerBack_{count}", mappedParam, -outerRadius);
+            directTree.AddChild(outerBackClip);
+
+            // Direct BlendTree の子パラメータを設定
+            var children = directTree.children;
+            children[0].directBlendParameter = outerFrontParam;
+            children[1].directBlendParameter = outerBackParam;
+            directTree.children = children;
+
+            if (hasInner)
+            {
+                controller.AddParameter(innerFrontParam, AnimatorControllerParameterType.Float);
+                var innerFrontClip = CreateAAPClip($"innerFront_{count}", mappedParam, -innerRadius);
+                var innerBackClip = CreateAAPClip($"innerBack_{count}", mappedParam, +innerRadius);
+                directTree.AddChild(innerFrontClip);
+                directTree.AddChild(innerBackClip);
+
+                var ch = directTree.children;
+                ch[2].directBlendParameter = innerFrontParam;
+                ch[3].directBlendParameter = innerBackParam;
+                directTree.children = ch;
+            }
+
+            calcState.motion = directTree;
+
+            maMergeAnimator.animator = controller;
+            maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            maMergeAnimator.matchAvatarWriteDefaults = true;
+        }
+        
+        private static AnimationClip CreateAAPClip(string name, string param, float value)
+        {
+            var clip = new AnimationClip();
+            clip.name = name;
+            var curve = AnimationCurve.Constant(0f, 1f, value);
+            clip.SetCurve("", typeof(Animator), param, curve);
+            return clip;
         }
     }
 }
