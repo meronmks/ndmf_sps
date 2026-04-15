@@ -43,7 +43,11 @@ namespace com.meronmks.ndmfsps
         {
             Self,
             Others,
-            Both
+            Both,
+            /// <summary>
+            /// allowSelf=true, allowOthers=trueの単一Contact Receiverを作成（分割しない）
+            /// </summary>
+            BothCombined
         }
 
         internal static void FindSpsComponents(BuildContext ctx)
@@ -304,8 +308,8 @@ namespace com.meronmks.ndmfsps
             receiver.shapeType = ContactBase.ShapeType.Sphere;
             receiver.radius = radius;
             receiver.position = pos;
-            receiver.allowSelf = party == ReceiverParty.Self;
-            receiver.allowOthers = party == ReceiverParty.Others;
+            receiver.allowSelf = party == ReceiverParty.Self || party == ReceiverParty.BothCombined;
+            receiver.allowOthers = party == ReceiverParty.Others || party == ReceiverParty.BothCombined;
             receiver.localOnly = localOnly;
             receiver.receiverType = receiverType;
             receiver.parameter = parameter;

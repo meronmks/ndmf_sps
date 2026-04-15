@@ -289,89 +289,150 @@ namespace com.meronmks.ndmfsps
         }
         
         /// <summary>
-        /// Plugの位置によって動くContact
+        /// Plugの位置によって動くContactとAAP距離計算
         /// </summary>
-        /// <param name="root"></param>
         internal static void CreateVRCContacts(BuildContext ctx, Transform root, Socket socket)
         {
             var animator = ctx.AvatarRootObject.GetComponent<Animator>();
-            
-            var maxDist = Math.Max(0, socket.depthActions.Max(a => Math.Max(a.startDistance, a.endDistance)));
-            var minDist = Math.Min(0, socket.depthActions.Min(a => Math.Min(a.startDistance, a.endDistance)));
-            // var offset = Math.Max(0, -minDist);
+            if (socket.depthActions.Count == 0) return;
+            var objectName = root.gameObject.name.Replace("/", "_");
+            var scale = socket.unitsInMeters ? 1f : root.lossyScale.z;
 
-            var cache = new Dictionary<bool, bool>();
+            var maxDist = Math.Max(0, socket.depthActions.Max(a => Math.Max(a.startDistance, a.endDistance))) * scale;
+            var minDist = Math.Min(0, socket.depthActions.Min(a => Math.Min(a.startDistance, a.endDistance))) * scale;
+            var offset = Math.Max(0, -minDist);
 
-            foreach (var depthAction in socket.depthActions)
+            var controller = new AnimatorController();
+            var math = new AapMath(controller, objectName);
+
+            // enableSelf ごとに距離計算用のContactとAAPを作成
+            var distanceParams = new Dictionary<bool, string>();
+
+            var enableSelfValues = socket.depthActions.Select(a => a.enableSelf).Distinct();
+            foreach (var enableSelf in enableSelfValues)
             {
-                if(cache.ContainsKey(depthAction.enableSelf)) continue;
-                cache[depthAction.enableSelf] = true;
+                var animParmPrefix = $"{objectName}/Anim{(enableSelf ? "" : "Others")}";
+                var outerRadius = Math.Max(0.01f, maxDist);
+                var party = enableSelf ? Processor.ReceiverParty.BothCombined : Processor.ReceiverParty.Others;
+
+                // Outer Front contact
                 var animationsRoot = Processor.CreateParentGameObject("Animations", root);
                 var outerGameObject = Processor.CreateParentGameObject("Outer", animationsRoot.transform);
                 var frontGameObject = Processor.CreateParentGameObject("Front", outerGameObject.transform);
-                var backGameObject = Processor.CreateParentGameObject("Back", outerGameObject.transform);
-                
-                var animParmPrefix = $"{root.gameObject.name.Replace("/", "_")}/Anim{(depthAction.enableSelf ? "" : "Others")}";
-                var outerRadius = Math.Max(0.01f, maxDist);
-                
+
+                var outerFrontParam = $"{animParmPrefix}/Outer/Front";
                 Processor.CreateVRCContactReceiver(
                     frontGameObject,
                     outerRadius,
                     Vector3.zero,
-                    new []
-                    {
-                        "TPS_Pen_Penetrating"
-                    },
-                    $"{animParmPrefix}/Outer/Front",
+                    new[] { "TPS_Pen_Penetrating" },
+                    outerFrontParam,
                     animator,
-                    depthAction.enableSelf ? Processor.ReceiverParty.Both : Processor.ReceiverParty.Others,
+                    party,
                     useHipAvoidance: socket.useHipAvoidance);
-                Processor.CreateVRCContactReceiver(
-                    backGameObject,
-                    outerRadius,
-                    Vector3.zero + Vector3.forward * -0.01f,
-                    new []
-                    {
-                        "TPS_Pen_Penetrating"
-                    },
-                    $"{animParmPrefix}/Outer/Back",
-                    animator,
-                    depthAction.enableSelf ? Processor.ReceiverParty.Both : Processor.ReceiverParty.Others,
-                    useHipAvoidance: socket.useHipAvoidance);
+
+                // Inner Front contact (負距離がある場合のみ)
+                string innerFrontParam = null;
                 if (minDist < 0)
                 {
                     var innerGameObject = Processor.CreateParentGameObject("Inner", animationsRoot.transform);
                     var frontInnerGameObject = Processor.CreateParentGameObject("Front", innerGameObject.transform);
-                    var backInnerGameObject = Processor.CreateParentGameObject("Back", innerGameObject.transform);
-                    
-                    var posOffset = Vector3.forward * minDist;
-                    
+
+                    innerFrontParam = $"{animParmPrefix}/Inner/Front";
                     Processor.CreateVRCContactReceiver(
                         frontInnerGameObject,
                         -minDist,
-                        posOffset,
-                        new []
-                        {
-                            "TPS_Pen_Penetrating"
-                        },
-                        $"{animParmPrefix}/Inner/Front",
+                        Vector3.forward * minDist,
+                        new[] { "TPS_Pen_Penetrating" },
+                        innerFrontParam,
                         animator,
-                        depthAction.enableSelf ? Processor.ReceiverParty.Both : Processor.ReceiverParty.Others,
-                        useHipAvoidance: socket.useHipAvoidance);
-                    Processor.CreateVRCContactReceiver(
-                        backInnerGameObject,
-                        -minDist,
-                        posOffset + Vector3.forward * -0.01f,
-                        new []
-                        {
-                            "TPS_Pen_Penetrating"
-                        },
-                        $"{animParmPrefix}/Inner/Back",
-                        animator,
-                        depthAction.enableSelf ? Processor.ReceiverParty.Both : Processor.ReceiverParty.Others,
+                        party,
                         useHipAvoidance: socket.useHipAvoidance);
                 }
+
+                // ---- AAP距離計算 ----
+                var distanceParam = $"{animParmPrefix}/Distance";
+                math.MakeAap(distanceParam, offset + outerRadius);
+
+                var targets = new List<(Motion motion, AapMath.ConditionFactory condition)>();
+
+                if (minDist < 0 && innerFrontParam != null)
+                {
+                    // Inner距離: Plugが完全にSocket内部 (outer.front >= 1)
+                    var innerDistParam = math.Map(
+                        $"{animParmPrefix}/Inner/Distance",
+                        innerFrontParam,
+                        1f, 0f,
+                        offset + minDist, offset + 0f);
+
+                    targets.Add((
+                        math.MakeCopier(innerDistParam, distanceParam),
+                        math.GreaterThan(outerFrontParam, 1f, orEqual: true)
+                    ));
+                }
+
+                if (maxDist > 0)
+                {
+                    // Outer距離: Plugが外側にいる (outer.front > 0)
+                    var outerDistParam = math.Map(
+                        $"{animParmPrefix}/Outer/Distance",
+                        outerFrontParam,
+                        1f, 0f,
+                        offset + 0f, offset + outerRadius);
+
+                    targets.Add((
+                        math.MakeCopier(outerDistParam, distanceParam),
+                        math.GreaterThan(outerFrontParam, 0f)
+                    ));
+                }
+
+                // フォールバック: 最大距離
+                targets.Add((
+                    math.MakeConstSetter(distanceParam, offset + outerRadius),
+                    null
+                ));
+
+                math.SetValueWithConditions(targets.ToArray());
+
+                distanceParams[enableSelf] = distanceParam;
             }
+
+            // 各DepthActionのMappedパラメータを計算
+            for (var i = 0; i < socket.depthActions.Count; i++)
+            {
+                var depthAction = socket.depthActions[i];
+                var mappedParam = $"{objectName}/Anim{i}/Mapped";
+                var distanceParam = distanceParams[depthAction.enableSelf];
+
+                if (depthAction.smoothingSeconds > 0)
+                {
+                    var rawMappedParam = $"{objectName}/Anim{i}/RawMapped";
+                    math.Map(
+                        rawMappedParam,
+                        distanceParam,
+                        offset + depthAction.startDistance * scale,
+                        offset + depthAction.endDistance * scale,
+                        0f, 1f);
+                    math.Smooth(mappedParam, rawMappedParam, depthAction.smoothingSeconds);
+                }
+                else
+                {
+                    math.Map(
+                        mappedParam,
+                        distanceParam,
+                        offset + depthAction.startDistance * scale,
+                        offset + depthAction.endDistance * scale,
+                        0f, 1f);
+                }
+            }
+
+            // AnimatorControllerにレイヤーを設定しMergeAnimatorでアタッチ
+            math.FinalizeController($"SPS Depth Calc for {objectName}");
+
+            var maMergeAnimator = root.gameObject.AddComponent<ModularAvatarMergeAnimator>();
+            maMergeAnimator.animator = controller;
+            maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
+            maMergeAnimator.matchAvatarWriteDefaults = true;
         }
         
         /// <summary>
@@ -419,16 +480,33 @@ namespace com.meronmks.ndmfsps
             offState.motion = emptyClip;
             
             var animClipTuple = Processor.CreateAnimationClip(ctx, socket.gameObject, depthAction.actions, onState);
-            
-            var blendTree = new BlendTree();
-            blendTree.name = $"{objectName}Tree {count}";
-            blendTree.blendType = BlendTreeType.Simple1D;
-            blendTree.blendParameter = parmName;
-            blendTree.useAutomaticThresholds = false;
-            blendTree.AddChild(animClipTuple.Item2, 0f);
-            blendTree.AddChild(animClipTuple.Item1, 1f);
-            
-            onState.motion = blendTree;
+            var onClip = animClipTuple.Item1;
+            var offClip = animClipTuple.Item2;
+
+            if (!IsStaticClip(onClip))
+            {
+                // Non-static clip: MotionTimeで駆動（タイムライン上の位置をMappedで制御）
+                var settings = AnimationUtility.GetAnimationClipSettings(onClip);
+                settings.loopTime = false;
+                AnimationUtility.SetAnimationClipSettings(onClip, settings);
+
+                onState.motion = onClip;
+                onState.timeParameterActive = true;
+                onState.timeParameter = parmName;
+            }
+            else
+            {
+                // Static clip: BlendTreeで0→off, 1→onをブレンド
+                var blendTree = new BlendTree();
+                blendTree.name = $"{objectName}Tree {count}";
+                blendTree.blendType = BlendTreeType.Simple1D;
+                blendTree.blendParameter = parmName;
+                blendTree.useAutomaticThresholds = false;
+                blendTree.AddChild(offClip, 0f);
+                blendTree.AddChild(onClip, 1f);
+
+                onState.motion = blendTree;
+            }
 
             var onTransition = offState.AddTransition(onState);
             var offTransition = onState.AddTransition(offState);
@@ -445,6 +523,32 @@ namespace com.meronmks.ndmfsps
             maMergeAnimator.animator = controller;
             maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
             maMergeAnimator.matchAvatarWriteDefaults = true;
+        }
+
+        /// <summary>
+        /// AnimationClipが静的（全カーブの全キーフレームがtime=0かつ同一値）かどうかを判定する。
+        /// VRCFuryのMotionExtensions.IsStatic相当。
+        /// </summary>
+        private static bool IsStaticClip(AnimationClip clip)
+        {
+            foreach (var binding in AnimationUtility.GetCurveBindings(clip))
+            {
+                var curve = AnimationUtility.GetEditorCurve(clip, binding);
+                if (curve == null) continue;
+                var keys = curve.keys;
+                if (keys.Length == 0) continue;
+                if (keys.All(key => key.time != 0)) return false;
+                if (keys.Select(k => k.value).Distinct().Count() > 1) return false;
+            }
+            foreach (var binding in AnimationUtility.GetObjectReferenceCurveBindings(clip))
+            {
+                var keys = AnimationUtility.GetObjectReferenceCurve(clip, binding);
+                if (keys == null) continue;
+                if (keys.Length == 0) continue;
+                if (keys.All(key => key.time != 0)) return false;
+                if (keys.Select(k => k.value).Distinct().Count() > 1) return false;
+            }
+            return true;
         }
 
         internal static void CreateActiveAnimations(BuildContext ctx, Socket socket, List<IAction> actions)
