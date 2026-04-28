@@ -15,6 +15,8 @@
   "inspector.socket.enableActiveAnimation": "Enable Active actions",
   "inspector.socket.activeAnimationActions": "Actions",
   "inspector.socket.haptics": "Haptics",
+  "inspector.socket.position": "Position",
+  "inspector.socket.rotation": "Rotation",
   "inspector.action.none": "None",
   "inspector.action.objectToggleAction.Obj": "target",
   "inspector.plug.automaticallyFindMesh": "Automatically find mesh",

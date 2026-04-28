@@ -23,6 +23,7 @@ namespace com.meronmks.ndmfsps
         private static SPSforNDMFTagComponent[] components;
         private static Socket[] sockets;
         private static Plug[] plugs;
+        private static Dictionary<Socket, Transform> socketBakeRoots;
 
         internal static readonly string[] selfContacts =
         {
@@ -55,17 +56,24 @@ namespace com.meronmks.ndmfsps
         internal static void CreateComponent(BuildContext ctx)
         {
             var animator = ctx.AvatarRootObject.GetComponent<Animator>();
-            
+            socketBakeRoots = new Dictionary<Socket, Transform>();
+
             foreach (var socket in sockets)
             {
-                SocketProcessor.CreateSender(animator, socket.transform, socket);
-                SocketProcessor.CreateLights(socket.transform, socket.mode);
-                SocketProcessor.CreateHaptics(ctx, animator, socket.transform, socket);
+                var bakedSpsSocket = CreateParentGameObject("BakedSpsSocket", socket.transform);
+                socketBakeRoots[socket] = bakedSpsSocket.transform;
+                bakedSpsSocket.transform.localPosition = socket.position;
+                bakedSpsSocket.transform.localRotation = Quaternion.Euler(socket.rotation);
+
+                var bakeRoot = bakedSpsSocket.transform;
+                SocketProcessor.CreateSender(animator, bakeRoot, socket);
+                SocketProcessor.CreateLights(bakeRoot, socket.mode);
+                SocketProcessor.CreateHaptics(ctx, animator, bakeRoot, socket);
                 if (socket.enableDepthAnimations)
                 {
-                    SocketProcessor.CreateVRCContacts(ctx, socket.transform, socket);
+                    SocketProcessor.CreateVRCContacts(ctx, bakeRoot, socket);
                 }
-                SocketProcessor.CreateAutoDistance(ctx, socket);
+                SocketProcessor.CreateAutoDistance(ctx, bakeRoot, socket);
             }
             
             foreach (var plug in plugs)
@@ -180,7 +188,7 @@ namespace com.meronmks.ndmfsps
                     i++;
                 }
 
-                SocketProcessor.CreateActiveAnimations(ctx, socket, socket.activeAnimationActions);
+                SocketProcessor.CreateActiveAnimations(ctx, socket, socket.activeAnimationActions, socketBakeRoots[socket]);
             }
             
             foreach (var plug in plugs)

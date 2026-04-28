@@ -15,6 +15,8 @@
   "inspector.socket.enableActiveAnimation": "ソケット有効時に同時にアクションを起こす",
   "inspector.socket.activeAnimationActions": "アクション一覧",
   "inspector.socket.haptics": "ハプティック",
+  "inspector.socket.position": "位置",
+  "inspector.socket.rotation": "回転",
   "inspector.action.none": "None",
   "inspector.action.objectToggleAction.Obj": "対象のオブジェクト",
   "inspector.plug.automaticallyFindMesh": "自動で対象メッシュを選択する",

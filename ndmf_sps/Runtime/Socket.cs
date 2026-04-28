@@ -28,7 +28,10 @@ namespace com.meronmks.ndmfsps.runtime
         public Haptics haptics;
         
         public bool sendersOnly = false;
-        
+
+        public Vector3 position = Vector3.zero;
+        public Vector3 rotation = Vector3.zero;
+
         private void Reset()
         {
             detectLength = false;

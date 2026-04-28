@@ -110,6 +110,20 @@ namespace com.meronmks.ndmfsps
                 {
                     serializedObject.ApplyModifiedProperties();
                 }
+                var pPosition = serializedObject.FindProperty(nameof(Socket.position));
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.PropertyField(pPosition, Localization.G("inspector.socket.position"));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                }
+                var pRotation = serializedObject.FindProperty(nameof(Socket.rotation));
+                EditorGUI.BeginChangeCheck();
+                EditorGUILayout.PropertyField(pRotation, Localization.G("inspector.socket.rotation"));
+                if (EditorGUI.EndChangeCheck())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                }
                 EditorGUI.indentLevel--;
             }
             serializedObject.ApplyModifiedProperties();
