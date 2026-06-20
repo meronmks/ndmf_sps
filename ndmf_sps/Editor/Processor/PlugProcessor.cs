@@ -806,8 +806,9 @@ namespace com.meronmks.ndmfsps
             maMergeAnimator.animator = controller;
             maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
             maMergeAnimator.matchAvatarWriteDefaults = true;
+            maMergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
         }
-        
+
         internal static void CreateDepthAnims(BuildContext ctx, Plug plug, DepthAction depthAction, int count)
         {
             if (!plug.enableDepthAnimations || plug.depthActions.Count == 0) return;
@@ -855,6 +856,7 @@ namespace com.meronmks.ndmfsps
             maMergeAnimator.animator = controller;
             maMergeAnimator.layerType = VRCAvatarDescriptor.AnimLayerType.FX;
             maMergeAnimator.matchAvatarWriteDefaults = true;
+            maMergeAnimator.pathMode = MergeAnimatorPathMode.Absolute;
         }
 
         internal static Dictionary<string, float> GetScaleProps(IEnumerable<Material> materials)

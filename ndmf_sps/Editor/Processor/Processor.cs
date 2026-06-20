@@ -484,6 +484,64 @@ namespace com.meronmks.ndmfsps
             return Quaternion.identity;
         }
 
+        /// <summary>
+        /// VRCFury の CreateNearestMatchPathRewriter 相当。
+        /// animObject から rootObject に向かって親を遡りながら、
+        /// originalPath と結合して実在するオブジェクトへのパスを探す。
+        /// </summary>
+        internal static string ResolveNearestMatchPath(string originalPath, GameObject animObject, GameObject rootObject)
+        {
+            var current = animObject.transform;
+            var rootTransform = rootObject.transform;
+            while (current != null)
+            {
+                var prefix = AnimationUtility.CalculateTransformPath(current, rootTransform);
+                var testPath = string.IsNullOrEmpty(prefix)
+                    ? originalPath
+                    : string.IsNullOrEmpty(originalPath)
+                        ? prefix
+                        : $"{prefix}/{originalPath}";
+                if (rootTransform.Find(testPath) != null)
+                {
+                    return testPath;
+                }
+                if (current == rootTransform) break;
+                current = current.parent;
+            }
+            return originalPath;
+        }
+
+        /// <summary>
+        /// AnimationClip 内の全バインディングのパスを nearest-match で書き換える。
+        /// </summary>
+        internal static void RewriteClipPaths(AnimationClip clip, GameObject animObject, GameObject rootObject)
+        {
+            foreach (var binding in AnimationUtility.GetCurveBindings(clip))
+            {
+                var curve = AnimationUtility.GetEditorCurve(clip, binding);
+                var newPath = ResolveNearestMatchPath(binding.path, animObject, rootObject);
+                if (newPath != binding.path)
+                {
+                    AnimationUtility.SetEditorCurve(clip, binding, null);
+                    var newBinding = binding;
+                    newBinding.path = newPath;
+                    AnimationUtility.SetEditorCurve(clip, newBinding, curve);
+                }
+            }
+            foreach (var binding in AnimationUtility.GetObjectReferenceCurveBindings(clip))
+            {
+                var keys = AnimationUtility.GetObjectReferenceCurve(clip, binding);
+                var newPath = ResolveNearestMatchPath(binding.path, animObject, rootObject);
+                if (newPath != binding.path)
+                {
+                    AnimationUtility.SetObjectReferenceCurve(clip, binding, null);
+                    var newBinding = binding;
+                    newBinding.path = newPath;
+                    AnimationUtility.SetObjectReferenceCurve(clip, newBinding, keys);
+                }
+            }
+        }
+
         internal static (AnimationClip, AnimationClip) CreateAnimationClip(BuildContext ctx, GameObject clipRoot, List<IAction> actions, AnimatorState animatorState)
         {
             var onClip = new AnimationClip();
@@ -501,6 +559,7 @@ namespace com.meronmks.ndmfsps
             {
                 var copy = Object.Instantiate(firstClip);
                 copy.name = onClip.name;
+                RewriteClipPaths(copy, clipRoot, ctx.AvatarRootObject);
                 onClip = copy;
             }
             
@@ -512,8 +571,8 @@ namespace com.meronmks.ndmfsps
                     {
                         if (clipAction.clip == null || clipAction.clip == firstClip) break;
                         var copy = Object.Instantiate(clipAction.clip);
+                        RewriteClipPaths(copy, clipRoot, ctx.AvatarRootObject);
                         onClip = copy;
-                        
                         break;
                     }
                     case ObjectToggleAction objectToggleAction:
@@ -531,7 +590,7 @@ namespace com.meronmks.ndmfsps
                         
                         var curveBinding = new EditorCurveBinding();
                         
-                        curveBinding.path = AnimationUtility.CalculateTransformPath(objectToggleAction.obj.transform, clipRoot.transform);
+                        curveBinding.path = AnimationUtility.CalculateTransformPath(objectToggleAction.obj.transform, ctx.AvatarRootObject.transform);
                         curveBinding.type = typeof(GameObject);
                         curveBinding.propertyName = "m_IsActive";
 
@@ -557,7 +616,7 @@ namespace com.meronmks.ndmfsps
                             
                             var curveBinding = new EditorCurveBinding();
 
-                            curveBinding.path = ctx.AvatarRootObject.name;
+                            curveBinding.path = AnimationUtility.CalculateTransformPath(skin.transform, ctx.AvatarRootObject.transform);
                             curveBinding.type = typeof(SkinnedMeshRenderer);
                             curveBinding.propertyName = $"blendShape.{blendShape.blendShape}";
 
