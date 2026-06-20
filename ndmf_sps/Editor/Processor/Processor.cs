@@ -116,8 +116,8 @@ namespace com.meronmks.ndmfsps
                             material.name = sourceMaterial.name;
                             material.CopyPropertiesFromMaterial(sourceMaterial);
                             material.shader = newShader;
-                            material.SetFloat("_SPS_Enabled", plug.animatedToggle ? 1f : 0f);
-                            bakedSpsPlug.SetActive(plug.animatedToggle);
+                            material.SetFloat("_SPS_Enabled", 1f);
+                            bakedSpsPlug.SetActive(true);
                             material.SetFloat("_SPS_Length", size.worldLength);
                             material.SetFloat("_SPS_BakedLength", size.worldLength);
                             material.SetFloat("_SPS_Overrun", plug.allowHoleOverrun ? 1f : 0f);
