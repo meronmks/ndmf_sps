@@ -8,25 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- NDMF ParameterProviderに対応
-- メニューの導入位置をカスタムする用のPrefabを追加
-- Socketに位置・回転のオフセットを指定するフィールドを追加
-- 
 
 ### Changed
-- PlugのコンポーネントにVRCFuryが存在しない場合エラーとなることを記載
-- SocketのSenders/Lights/Haptics/Animations/AutoDistanceをBakedSpsSocket中間オブジェクト配下に生成するよう変更（VRCFuryとの互換性向上）
-- アニメーションクリップのパスを書き換える処理が無く一部動作しない問題を修正（VRCFuryとの互換性向上）
-- BakedSpsPlugを常にアクティブで生成するように
-
-### Deprecated
 
 ### Removed
 
 ### Fixed
-- 自動生成されるSocketのMenuが壊れてて動作していなかった問題を修正
 
 ### Security
+
+## [0.0.0-beta.5] - 2026-06-20
+
+### Added
+- NDMF ParameterProviderに対応
+- メニューの導入位置をカスタムする用のPrefabを追加
+- Socketに位置・回転のオフセットを指定するフィールドを追加
+
+### Changed
+- PlugのコンポーネントにVRCFuryが存在しない場合エラーとなることを記載
+- SocketのSenders/Lights/Haptics/Animations/AutoDistanceをBakedSpsSocket中間オブジェクト配下に生成するよう変更（VRCFuryとの互換性向上）
+- BakedSpsPlugを常にアクティブで生成するように
+
+### Fixed
+- 自動生成されるSocketのMenuが壊れてて動作していなかった問題を修正
+- アニメーションクリップのパスを書き換える処理が無く一部動作しない問題を修正（VRCFuryとの互換性向上）
 
 ## [0.0.0-beta.4] - 2026-01-31
 
@@ -40,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - VRCFury v1.1229.0以降で必要となるSPSのパラメータを追加 by @Narazaka in [#6]
 
 [Unreleased]: https://github.com/meronmks/ndmf_sps/compare/v0.0.0-beta.4...HEAD
+[0.0.0-beta.5]: https://github.com/meronmks/ndmf_sps/releases/tag/v0.0.0-beta.5
 [0.0.0-beta.4]: https://github.com/meronmks/ndmf_sps/releases/tag/v0.0.0-beta.4
 [#5]: https://github.com/meronmks/ndmf_sps/pull/5
 [#6]: https://github.com/meronmks/ndmf_sps/pull/6
