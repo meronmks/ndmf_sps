@@ -11,10 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - NDMF ParameterProviderに対応
 - メニューの導入位置をカスタムする用のPrefabを追加
 - Socketに位置・回転のオフセットを指定するフィールドを追加
+- 
 
 ### Changed
 - PlugのコンポーネントにVRCFuryが存在しない場合エラーとなることを記載
 - SocketのSenders/Lights/Haptics/Animations/AutoDistanceをBakedSpsSocket中間オブジェクト配下に生成するよう変更（VRCFuryとの互換性向上）
+- アニメーションクリップのパスを書き換える処理が無く一部動作しない問題を修正（VRCFuryとの互換性向上）
+- BakedSpsPlugを常にアクティブで生成するように
 
 ### Deprecated
 
